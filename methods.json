@@ -1,0 +1,174 @@
+[
+  {
+    "method_id": 1,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS account_last_name",
+              "DROP INDEX IF EXISTS account_last_name_lower",
+              "CREATE INDEX IF NOT EXISTS account_last_name ON account (last_name);"
+            ],
+            "query_script": "SELECT * FROM account WHERE lower(last_name)='daniels';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM account \nWHERE last_name='daniels'\nOR last_name='Daniels'\nOR last_name ='DANIELS';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS account_last_name_lower ON account (lower(last_name));"
+            ],
+            "query_script": "SELECT * FROM account WHERE lower(last_name)='daniels';",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS title_title",
+              "DROP INDEX IF EXISTS title_title_lower",
+              "CREATE INDEX IF NOT EXISTS title_title ON title (title);"
+            ],
+            "query_script": "SELECT * FROM title WHERE lower(title)='pilot';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM title \nWHERE title='Pilot'\nOR title='PILOT'\nOR title ='pilot';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS title_title_lower ON title (lower(title));"
+            ],
+            "query_script": "SELECT * FROM title WHERE lower(title)='pilot';",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 2,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS flight_scheduled_departure ON flight(scheduled_departure);"
+            ],
+            "query_script": "SELECT * FROM flight\nWHERE scheduled_departure ::date BETWEEN '2020-08-17' AND '2020-08-18'",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM flight\nWHERE scheduled_departure BETWEEN '2020-08-17' AND '2020-08-19';",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS aka_title_production_year ON aka_title(production_year);"
+            ],
+            "query_script": "SELECT * FROM aka_title WHERE production_year::text = '2011';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM aka_title WHERE production_year = 2011;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 3,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS flight_actual_departure ON flight (actual_departure);",
+              "CREATE INDEX IF NOT EXISTS flight_scheduled_departure ON flight (scheduled_departure);"
+            ],
+            "query_script": "SELECT * FROM flight\nWHERE COALESCE(actual_departure, scheduled_departure) BETWEEN '2020-08-17' AND '2020-08-18'",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM flight\nWHERE (actual_departure BETWEEN '2020-08-17' AND '2020-08-18')\nOR (\nactual_departure IS NULL\nAND scheduled_departure BETWEEN '2020-08-17' AND '2020-08-18'\n);",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS company_name_name_pcode_nf ON company_name(name_pcode_nf);",
+              "CREATE INDEX IF NOT EXISTS company_name_name_pcode_sf ON company_name(name_pcode_sf);"
+            ],
+            "query_script": "SELECT * FROM company_name \nWHERE COALESCE(name_pcode_nf, name_pcode_sf) = 'A253';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM company_name \nWHERE (name_pcode_nf = 'A253') \nOR (\nname_pcode_nf IS NULL\nAND name_pcode_sf = 'A253'\n);",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 0,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  }
+]
