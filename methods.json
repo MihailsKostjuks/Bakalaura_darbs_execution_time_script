@@ -137,6 +137,139 @@
     ]
   },
   {
+    "method_id": 4,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP INDEX IF  EXISTS account_last_name_lower_pattern"
+            ],
+            "query_script": "SELECT * FROM account WHERE LOWER(last_name) LIKE 'johns%';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM account WHERE (LOWER(last_name) >='johns' AND LOWER(last_name) < 'johnt');",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS account_last_name_lower_pattern ON account (LOWER(last_name) text_pattern_ops);"
+            ],
+            "query_script": "SELECT * FROM account WHERE LOWER(last_name) LIKE 'johns%';",
+            "cleanup_scripts": [
+              "DROP INDEX IF  EXISTS account_last_name_lower_pattern"
+            ]
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS title_title_lower_pattern"
+            ],
+            "query_script": "SELECT * FROM title WHERE LOWER(title) LIKE 'the best%'",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM title WHERE (LOWER(title) >='the best' AND LOWER(title) < 'the besu');",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS title_title_lower_pattern ON title (LOWER(title) text_pattern_ops);"
+            ],
+            "query_script": "SELECT * FROM title WHERE LOWER(title) LIKE 'the best%';",
+            "cleanup_scripts": [
+              "DROP INDEX IF EXISTS title_title_lower_pattern"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 5,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT bp.update_ts Boarding_pass_issued,\n scheduled_departure,\n actual_departure,\n status\nFROM flight f\nJOIN booking_leg bl USING (flight_id)\nJOIN boarding_pass bp USING (booking_leg_id)\nWHERE bp.update_ts > scheduled_departure + interval '30 minutes'\nAND f.update_ts >= scheduled_departure - interval '1 hour';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS boarding_pass_update_ts ON boarding_pass (update_ts);"
+            ],
+            "query_script": "SELECT bp.update_ts Boarding_pass_issued,\n scheduled_departure,\n actual_departure,\n status\nFROM flight f\nJOIN booking_leg bl USING (flight_id)\nJOIN boarding_pass bp USING (booking_leg_id)\nWHERE bp.update_ts > scheduled_departure + interval '30 minutes'\nAND f.update_ts >= scheduled_departure - interval '1 hour'\nAND bp.update_ts >= '2020-08-16' \nAND bp.update_ts < '2020-08-20';",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT *\nFROM title\nJOIN movie_companies ON title.id = movie_companies.movie_id\nJOIN company_name ON company_name.id = movie_companies.company_id\nWHERE company_name.country_code = '[us]';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE INDEX IF NOT EXISTS title_production_year ON title(production_year);"
+            ],
+            "query_script": "SELECT *\nFROM title\nJOIN movie_companies ON title.id = movie_companies.movie_id\nJOIN company_name ON company_name.id = movie_companies.company_id\nWHERE company_name.country_code = '[us]'\nAND title.production_year = 2010;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 0,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              ""
+            ],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
     "method_id": 0,
     "method_data": [
       {
