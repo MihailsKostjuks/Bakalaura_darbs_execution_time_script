@@ -147,12 +147,15 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT DISTINCT name\nFROM (\nSELECT primary_title, original_title, crew.title_id, person_id, category\nFROM crew\nINNER JOIN titles ON titles.title_id = crew.title_id\nWHERE primary_title LIKE 'Spider-Man %'\nOR original_title LIKE 'Spider-Man %'\n) AS a\nINNER JOIN people ON a.person_id = people.person_id\nWHERE a.category = 'actor'\nOR a.category = 'actress';",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": ["DROP MATERIALIZED VIEW IF EXISTS q3;"],
+            "query_script": [
+              "CREATE MATERIALIZED VIEW q3\nAS\nSELECT primary_title, original_title, crew.title_id, person_id, category\nFROM crew\nINNER JOIN titles ON titles.title_id = crew.title_id\nWHERE primary_title LIKE 'Spider-Man %'\nOR original_title LIKE 'Spider-Man %';",
+              "SELECT DISTINCT name FROM people\nINNER JOIN q3 ON q3.person_id = people.person_id\nWHERE q3.category = 'actor'\nOR q3.category = 'actress';"
+            ],
             "cleanup_scripts": []
           }
         ]
@@ -162,12 +165,15 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT DISTINCT ff.first_name, ff.last_name, booking_with_account.price\nFROM (\nSELECT b.booking_id, b.account_id, b.price, a.frequent_flyer_id\nFROM booking b\nINNER JOIN account a ON b.account_id = a.account_id\nWHERE b.price > 300\n) AS booking_with_account\nINNER JOIN frequent_flyer ff ON booking_with_account.frequent_flyer_id = ff.frequent_flyer_id\nWHERE ff.first_name LIKE 'J%';",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": ["DROP MATERIALIZED VIEW IF EXISTS booking_with_account_mv;"],
+            "query_script": [
+              "CREATE MATERIALIZED VIEW booking_with_account_mv\nAS \nSELECT b.booking_id, b.account_id, b.price, a.frequent_flyer_id\nFROM booking b\nINNER JOIN account a ON b.account_id = a.account_id\nWHERE b.price > 300;",
+              "SELECT DISTINCT ff.first_name, ff.last_name, booking_with_account_mv.price\nFROM booking_with_account_mv\nINNER JOIN frequent_flyer ff ON booking_with_account_mv.frequent_flyer_id = ff.frequent_flyer_id\nWHERE ff.first_name LIKE 'J%';"
+            ],
             "cleanup_scripts": []
           }
         ]
@@ -182,12 +188,12 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT primary_title , premiered\nFROM titles\nWHERE type LIKE 'movie'\nAND premiered BETWEEN 2000 AND 2010\nORDER BY premiered ASC;",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT primary_title , premiered\nFROM titles\nWHERE type = 'movie'\nAND premiered BETWEEN 2000 AND 2010\nORDER BY premiered ASC;",
             "cleanup_scripts": []
           }
         ]
@@ -197,12 +203,12 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT phone, phone_type, primary_phone FROM phone\nWHERE phone_type LIKE 'mobile'\nAND LENGTH(phone) = 10\nORDER BY phone;\n",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT phone, phone_type, primary_phone FROM phone\nWHERE phone_type = 'mobile'\nAND LENGTH(phone) = 10\nORDER BY phone;",
             "cleanup_scripts": []
           }
         ]
@@ -813,16 +819,16 @@
         ]
       },
       {
-        "database_name": "imdb_old",
+        "database_name": "imdb_stokholm",
         "baseline_and_variations": [
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": ["CREATE OR REPLACE FUNCTION num_people_by_job(p_title_id varchar, p_job varchar) RETURNS integer \nAS\n$$BEGIN\nRETURN (\nSELECT COUNT(DISTINCT p.person_id)\nFROM public.crew c\nJOIN public.people p ON c.person_id = p.person_id\nWHERE c.title_id = p_title_id\nAND c.job = p_job;\n);\nEND;\n$$ LANGUAGE plpgsql;"],
+            "query_script": "SELECT \nt.title_id,\nt.primary_title,\nnum_people_by_job(t.title_id, 'actor') AS num_actors\nFROM public.titles t\nWHERE type = 'tvSpecial'\nGROUP BY t.title_id\nORDER BY num_actors DESC;",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT \nt.title_id,\nt.primary_title,\nCOUNT(DISTINCT p.person_id) AS num_people\nFROM public.titles t\nJOIN public.crew c ON t.title_id = c.title_id\nJOIN public.people p ON c.person_id = p.person_id\nWHERE t.type = 'tvSpecial'\nAND c.category = 'actor'\nGROUP BY t.title_id\nORDER BY num_actors DESC;",
             "cleanup_scripts": []
           }
         ]
