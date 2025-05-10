@@ -871,7 +871,7 @@
     ]
   },
   {
-    "method_id": 0,
+    "method_id": 23,
     "method_data": [
       {
         "database_name": "postgres_air",
@@ -906,7 +906,59 @@
     ]
   },
   {
-    "method_id": 0,
+    "method_id": 24,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT\ncity,\ndate_trunc('month', scheduled_departure),\nSUM(passengers) passengers\nFROM airport a\nJOIN flight f ON airport_code = departure_airport\nJOIN (\nSELECT flight_id, COUNT(*) passengers\nFROM booking_leg l\nJOIN boarding_pass b USING (booking_leg_id)\nWHERE boarding_time > '2020-07-15' AND boarding_time < '2020-07-31'\nGROUP BY flight_id\n) cnt\nUSING (flight_id)\nGROUP BY 1,2\nORDER BY 3 DESC;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE TABLE IF NOT EXISTS boarding_pass_part (\nboarding_pass_id SERIAL,\npassenger_id BIGINT,\nbooking_leg_id BIGINT,\nseat TEXT,\nboarding_time TIMESTAMPTZ,\nprecheck BOOLEAN,\nupdate_ts TIMESTAMPTZ\n)\nPARTITION BY RANGE (boarding_time);",
+              "CREATE TABLE IF NOT EXISTS boarding_pass_may\nPARTITION OF boarding_pass_part\nFOR VALUES\nFROM ('2020-05-01'::timestamptz)\nTO ('2020-06-01'::timestamptz);",
+              "CREATE TABLE IF NOT EXISTS boarding_pass_june\nPARTITION OF boarding_pass_part\nFOR VALUES\nFROM ('2020-06-01'::timestamptz)\nTO ('2020-07-01'::timestamptz);",
+              "CREATE TABLE IF NOT EXISTS boarding_pass_july\nPARTITION OF boarding_pass_part\nFOR VALUES\nFROM ('2020-07-01'::timestamptz)\nTO ('2020-08-01'::timestamptz);",
+              "CREATE TABLE IF NOT EXISTS boarding_pass_aug\nPARTITION OF boarding_pass_part\nFOR VALUES\nFROM ('2020-08-01'::timestamptz)\nTO ('2020-09-01'::timestamptz);",
+              "DO $$\nBEGIN\n    IF NOT EXISTS (SELECT 1 FROM boarding_pass_part LIMIT 1) THEN\n        INSERT INTO boarding_pass_part SELECT * from boarding_pass;\n    END IF;\nEND$$;"
+            ],
+            "query_script": "SELECT\ncity,\ndate_trunc('month', scheduled_departure),\nSUM(passengers) passengers\nFROM airport a\nJOIN flight f ON airport_code = departure_airport\nJOIN (\nSELECT flight_id, COUNT(*) passengers\nFROM booking_leg l\nJOIN boarding_pass_part b USING (booking_leg_id)\nWHERE boarding_time > '2020-07-15' AND boarding_time < '2020-07-31'\nGROUP BY flight_id\n) cnt\nUSING (flight_id)\nGROUP BY 1,2\nORDER BY 3 DESC;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_stokholm",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT\nregion,\npremiered,\nCOUNT(*) AS people_count\nFROM titles t\nJOIN crew c ON t.title_id = c.title_id\nJOIN akas ON akas.title_id = t.title_id\nWHERE category IN ('actor', 'actress', 'director')\nGROUP BY region, premiered\nORDER BY people_count DESC;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "CREATE TABLE IF NOT EXISTS crew_part\n(\n    title_id character varying,\n    person_id character varying,\n    category character varying,\n    job character varying\n)\nPARTITION BY LIST (category);",
+              "CREATE TABLE IF NOT EXISTS crew_part_director\nPARTITION OF crew_part\nFOR VALUES IN ('director');",
+              "CREATE TABLE IF NOT EXISTS crew_part_actor\nPARTITION OF crew_part\nFOR VALUES IN ('actor');",
+              "CREATE TABLE IF NOT EXISTS crew_part_actress\nPARTITION OF crew_part\nFOR VALUES IN ('actress');",
+              "CREATE TABLE IF NOT EXISTS crew_part_producer\nPARTITION OF crew_part\nFOR VALUES IN ('producer');",
+              "CREATE TABLE IF NOT EXISTS crew_part_self\nPARTITION OF crew_part\nFOR VALUES IN ('self');",
+              "CREATE TABLE IF NOT EXISTS crew_part_editor\nPARTITION OF crew_part\nFOR VALUES IN ('editor');",
+              "CREATE TABLE IF NOT EXISTS crew_part_other\nPARTITION OF crew_part\nDEFAULT;",
+              "DO $$\nBEGIN\n    IF NOT EXISTS (SELECT 1 FROM crew_part LIMIT 1) THEN\n        INSERT INTO crew_part SELECT * FROM crew;\n    END IF;\nEND$$;"
+            ],
+            "query_script": "SELECT\nregion,\npremiered,\nCOUNT(*) AS people_count\nFROM titles t\nJOIN crew_part c ON t.title_id = c.title_id\nJOIN akas ON akas.title_id = t.title_id\nWHERE category IN ('actor', 'actress', 'director')\nGROUP BY region, premiered\nORDER BY people_count DESC;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 25,
     "method_data": [
       {
         "database_name": "postgres_air",
@@ -941,7 +993,77 @@
     ]
   },
   {
-    "method_id": 0,
+    "method_id": 26,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 27,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 28,
     "method_data": [
       {
         "database_name": "postgres_air",
