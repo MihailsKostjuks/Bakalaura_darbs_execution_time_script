@@ -3,6 +3,251 @@
     "method_id": 1,
     "method_data": [
       {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT \nMIN(mc.note) AS production_note,\nMIN(t.title) AS movie_title,\nMIN(t.production_year) AS movie_year\nFROM \ncompany_type AS ct,\ninfo_type AS it,\nmovie_companies AS mc,\nmovie_info_idx AS mi_idx,\ntitle AS t\nWHERE ct.kind = 'production companies'\nAND it.info = 'top 250 rank'\nAND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'\nAND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')\nAND ct.id = mc.company_type_id\nAND t.id = mc.movie_id\nAND t.id = mi_idx.movie_id\nAND mc.movie_id = mi_idx.movie_id\nAND it.id = mi_idx.info_type_id;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": ["SET enable_seqscan = OFF;"],
+            "query_script": "SELECT \nMIN(mc.note) AS production_note,\nMIN(t.title) AS movie_title,\nMIN(t.production_year) AS movie_year\nFROM \ncompany_type AS ct,\ninfo_type AS it,\nmovie_companies AS mc,\nmovie_info_idx AS mi_idx,\ntitle AS t\nWHERE ct.kind = 'production companies'\nAND it.info = 'top 250 rank'\nAND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'\nAND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')\nAND ct.id = mc.company_type_id\nAND t.id = mc.movie_id\nAND t.id = mi_idx.movie_id\nAND mc.movie_id = mi_idx.movie_id\nAND it.id = mi_idx.info_type_id;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [""],
+            "query_script": "SELECT * FROM flight\nJOIN aircraft ON aircraft_code = code\nJOIN airport ON departure_airport = airport_code\nJOIN booking_leg USING (flight_id)\nJOIN booking USING (booking_id)\nWHERE range BETWEEN 3000 AND 7000 \nAND airport.continent = 'AS'\nAND booking.price < 300\nAND status = 'Delayed';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": ["SET enable_seqscan = OFF;"],
+            "query_script": "SELECT * FROM flight\nJOIN aircraft ON aircraft_code = code\nJOIN airport ON departure_airport = airport_code\nJOIN booking_leg USING (flight_id)\nJOIN booking USING (booking_id)\nWHERE range BETWEEN 3000 AND 7000 \nAND airport.continent = 'AS'\nAND booking.price < 300\nAND status = 'Delayed';",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 2,
+    "method_data": [
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT \nMIN(mc.note) AS production_note,\nMIN(t.title) AS movie_title,\nMIN(t.production_year) AS movie_year\nFROM \ncompany_type AS ct,\ninfo_type AS it,\nmovie_companies AS mc,\nmovie_info_idx AS mi_idx,\ntitle AS t\nWHERE ct.kind = 'production companies'\nAND it.info = 'top 250 rank'\nAND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'\nAND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')\nAND ct.id = mc.company_type_id\nAND t.id = mc.movie_id\nAND t.id = mi_idx.movie_id\nAND mc.movie_id = mi_idx.movie_id\nAND it.id = mi_idx.info_type_id;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": ["SET enable_hashjoin = OFF;"],
+            "query_script": "SELECT \nMIN(mc.note) AS production_note,\nMIN(t.title) AS movie_title,\nMIN(t.production_year) AS movie_year\nFROM \ncompany_type AS ct,\ninfo_type AS it,\nmovie_companies AS mc,\nmovie_info_idx AS mi_idx,\ntitle AS t\nWHERE ct.kind = 'production companies'\nAND it.info = 'top 250 rank'\nAND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'\nAND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')\nAND ct.id = mc.company_type_id\nAND t.id = mc.movie_id\nAND t.id = mi_idx.movie_id\nAND mc.movie_id = mi_idx.movie_id\nAND it.id = mi_idx.info_type_id;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM flight\nJOIN aircraft ON aircraft_code = code\nJOIN airport ON departure_airport = airport_code\nJOIN booking_leg USING (flight_id)\nJOIN booking USING (booking_id)\nJOIN passenger USING (booking_id)\nJOIN account ON passenger.account_id = account.account_id\nWHERE price BETWEEN 500 AND 1000\nAND continent = 'EU'\nAND LOWER(account.first_name) LIKE 'john%';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": ["SET enable_hashjoin = OFF;"],
+            "query_script": "SELECT * FROM flight\nJOIN aircraft ON aircraft_code = code\nJOIN airport ON departure_airport = airport_code\nJOIN booking_leg USING (flight_id)\nJOIN booking USING (booking_id)\nJOIN passenger USING (booking_id)\nJOIN account ON passenger.account_id = account.account_id\nWHERE price BETWEEN 500 AND 1000\nAND continent = 'EU'\nAND LOWER(account.first_name) LIKE 'john%';",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 3,
+    "method_data": [
+      {
+        "database_name": "imdb_stokholm",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT COUNT (DISTINCT title_id) FROM titles\nWHERE type IN ('movie', 'video');",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT COUNT (title_id) FROM titles\nWHERE type IN ('movie', 'video');",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT COUNT (DISTINCT phone_id) FROM phone \nWHERE phone_type IN ('home', 'work');",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT COUNT (phone_id) FROM phone \nWHERE phone_type IN ('home', 'work');",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 4,
+    "method_data": [
+      {
+        "database_name": "imdb_stokholm",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT type , COUNT(*)\nFROM titles\nGROUP BY (type)\nORDER BY (type) ASC;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT type , COUNT(title_id)\nFROM titles\nGROUP BY (type)\nORDER BY (type) ASC;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT level, COUNT(*) FROM frequent_flyer\nGROUP BY level\nORDER BY level ASC;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT level, COUNT(frequent_flyer_id) FROM frequent_flyer\nGROUP BY level\nORDER BY level ASC;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 5,
+    "method_data": [
+      {
+        "database_name": "imdb_stokholm",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 6,
+    "method_data": [
+      {
+        "database_name": "imdb_stokholm",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 7,
+    "method_data": [
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 8,
+    "method_data": [
+      {
         "database_name": "postgres_air",
         "baseline_and_variations": [
           {
@@ -57,7 +302,7 @@
     ]
   },
   {
-    "method_id": 2,
+    "method_id": 9,
     "method_data": [
       {
         "database_name": "postgres_air",
@@ -96,7 +341,7 @@
     ]
   },
   {
-    "method_id": 3,
+    "method_id": 10,
     "method_data": [
       {
         "database_name": "postgres_air",
@@ -137,7 +382,7 @@
     ]
   },
   {
-    "method_id": 4,
+    "method_id": 11,
     "method_data": [
       {
         "database_name": "postgres_air",
@@ -194,7 +439,7 @@
     ]
   },
   {
-    "method_id": 5,
+    "method_id": 12,
     "method_data": [
       {
         "database_name": "postgres_air",
@@ -233,6 +478,393 @@
     ]
   },
   {
+    "method_id": 13,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS flight_canceled;"
+
+            ],
+            "query_script": "SELECT * FROM flight \nWHERE scheduled_departure BETWEEN '2020-08-15' AND '2024-08-18'\nAND status='Canceled';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": ["CREATE INDEX IF NOT EXISTS flight_canceled ON flight(flight_id) WHERE status='Canceled';"],
+            "query_script": "SELECT * FROM flight \nWHERE scheduled_departure BETWEEN '2020-08-15' AND '2024-08-18'\nAND status='Canceled';",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS company_name_en;"
+            ],
+            "query_script": "SELECT * FROM company_name WHERE country_code = '[en]';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": ["CREATE INDEX IF NOT EXISTS company_name_en ON company_name(id) WHERE country_code = '[en]';"],
+            "query_script": "SELECT * FROM company_name WHERE country_code = '[en]';",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 14,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT flight_id FROM flight \nWHERE flight_id NOT IN (SELECT flight_id FROM booking_leg);",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT flight_id FROM flight f\nEXCEPT\nSELECT flight_id FROM booking_leg;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              ""
+            ],
+            "query_script": "SELECT id FROM title\nWHERE id NOT IN (SELECT movie_id FROM aka_title);",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT id FROM title\nEXCEPT\nSELECT movie_id FROM aka_title;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 15,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT flight_id FROM flight\nWHERE flight_id IN (SELECT flight_id FROM booking_leg);",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT flight_id FROM flight f\nINTERSECT\nSELECT flight_id FROM booking_leg;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              ""
+            ],
+            "query_script": "SELECT id FROM title\nWHERE id IN (SELECT movie_id FROM aka_title);",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT id FROM title\nINTERSECT\nSELECT movie_id FROM aka_title;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 16,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT\nCASE\nWHEN actual_departure>scheduled_departure + interval '1 hour' THEN 'Late\ngroup 1'\nELSE 'Late group 2'\nEND AS grouping,\nflight_id,\nCOUNT(*) AS num_passengers\nFROM boarding_pass bp\nJOIN booking_leg bl USING (booking_leg_id)\nJOIN booking b USING (booking_id)\nJOIN flight f USING (flight_id)\nWHERE departure_airport='FRA'\nAND actual_departure>'2020-07-01' AND ( (\nactual_departure>scheduled_departure + interval '30 minute'\nAND actual_departure<=scheduled_departure + interval '1 hour'\n)\nOR\n(actual_departure>scheduled_departure + interval '1 hour'\nAND bp.update_ts >scheduled_departure + interval '30 minute')\n)\nGROUP BY 1,2;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT\n'Late group 1' AS grouping,\nflight_id,\ncount(*) AS num_passengers\nFROM boarding_pass bp\nJOIN booking_leg bl USING (booking_leg_id)\nJOIN booking b USING (booking_id)\nJOIN flight f USING (flight_id)\nWHERE departure_airport='FRA' AND\nactual_departure>scheduled_departure + interval '1 hour' AND\nbp.update_ts > scheduled_departure + interval '30 minutes'\nAND actual_departure>'2020-07-01'\nGROUP BY 1,2\nUNION ALL\nSELECT\n'Late group 2' AS grouping,\nflight_id,\nCOUNT(*) AS num_passengers\nFROM boarding_pass bp\nJOIN booking_leg bl USING(booking_leg_id)\nJOIN booking b USING (booking_id)\nJOIN flight f USING (flight_id)\nWHERE departure_airport='FRA' AND\nactual_departure>scheduled_departure + interval '30 minute'\nAND actual_departure<=scheduled_departure + interval '1 hour'\nAND actual_departure>'2020-07-01'\nGROUP BY 1,2;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              ""
+            ],
+            "query_script": "SELECT \nCASE WHEN c.country_code = '[es]' THEN 'Old TV movies made by Spanish companies'\nELSE 'Modern TV movies made by Italian companies' END AS description, t.title, t.production_year\nFROM title t\nJOIN movie_companies mc ON t.id = mc.movie_id\nJOIN company_name c ON mc.company_id = c.id\nWHERE mc.note LIKE '%TV%'\nAND (\n(c.country_code = '[es]' AND t.production_year < 2000)\nOR \n(c.country_code = '[it]' AND t.production_year > 2010)\n);",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT \n'Old TV movies made by Spanish companies' AS description,\nt.title,\nt.production_year\nFROM title t\nJOIN movie_companies mc ON t.id = mc.movie_id\nJOIN company_name c ON mc.company_id = c.id\nWHERE mc.note LIKE '%TV%'\nAND c.country_code = '[es]' \nAND t.production_year < 2000\nUNION ALL\nSELECT \n'Modern TV movies made by Italian companies' AS description, t.title, t.production_year\nFROM title t\nJOIN movie_companies mc ON t.id = mc.movie_id\nJOIN company_name c ON mc.company_id = c.id\nWHERE mc.note LIKE '%TV%'\nAND c.country_code = '[it]' \nAND t.production_year > 2010;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 17,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": [
+              "CREATE TEMP TABLE flights_totals AS\nSELECT\nbl.flight_id,\ndeparture_airport,\n(AVG(price))::numeric (7,2) AS avg_price,\nCOUNT(DISTINCT passenger_id) AS num_passengers\nFROM booking b\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN passenger p USING (booking_id)\nGROUP BY 1,2;",
+              "SELECT flight_id,\navg_price,\nnum_passengers\nFROM flights_totals\nWHERE flight_id=222183;"
+            ],
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM\n(SELECT \nbl.flight_id,\ndeparture_airport,\n(AVG(price))::numeric (7,2) AS avg_price,\nCOUNT(DISTINCT passenger_id) AS num_passengers\nFROM booking b\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN passenger p USING (booking_id)\nGROUP BY 1,2) a\nWHERE flight_id=222183;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              ""
+            ],
+            "query_script": [
+              "CREATE TEMP TABLE ratings AS \nSELECT t.title AS movie_title, MAX(mi_idx.info) AS max_rating, t.id AS title_id\nFROM info_type it\nJOIN movie_info_idx mi_idx ON it.id = mi_idx.info_type_id\nJOIN title t ON t.id = mi_idx.movie_id\nWHERE it.info = 'rating'\nGROUP BY movie_title, t.id;",
+              "SELECT * FROM ratings WHERE title_id = 1088622;"
+            ],
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT * FROM (\nSELECT t.title AS movie_title, MAX(mi_idx.info) AS max_rating, t.id AS title_id\nFROM info_type it\nJOIN movie_info_idx mi_idx ON it.id = mi_idx.info_type_id\nJOIN title t ON t.id = mi_idx.movie_id\nWHERE it.info = 'rating'\nGROUP BY movie_title, t.id\n) ratings\nWHERE title_id = 1088622;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 18,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP VIEW IF EXISTS flight_stats;",
+              "CREATE VIEW flight_stats AS\nSELECT bl.flight_id,\ndeparture_airport,\n(AVG(price))::numeric (7,2) AS avg_price,\nCOUNT(DISTINCT passenger_id) AS num_passengers\nFROM booking b\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN passenger p USING (booking_id)\nGROUP BY 1,2;"
+            ],
+            "query_script": "SELECT * FROM flight_stats fs\nJOIN (SELECT flight_id FROM flight f\nWHERE actual_departure BETWEEN '2020-08-01' AND '2020-08-16') fl\nON fl.flight_id=fs.flight_id;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT \nbl.flight_id,\ndeparture_airport,\n(AVG(price))::numeric (7,2) AS avg_price,\nCOUNT(DISTINCT passenger_id) AS num_passengers\nFROM booking b\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN passenger p USING (booking_id)\nWHERE actual_departure BETWEEN '2020-08-01' AND '2020-08-16'\nGROUP BY 1,2;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP VIEW IF EXISTS us_title_stats;",
+              "CREATE VIEW us_title_stats AS \nSELECT title.production_year AS prod_year, \ntitle.id AS title_id, \nCOUNT(DISTINCT title.id) AS amount_of_titles\nFROM title\nJOIN movie_companies ON title.id = movie_companies.movie_id\nJOIN company_name ON company_name.id = movie_companies.company_id\nWHERE company_name.country_code = '[us]'\nGROUP BY 1, 2;"
+            ],
+            "query_script": "SELECT * FROM us_title_stats\nJOIN (SELECT id FROM title WHERE production_year BETWEEN 2005 AND 2010) t\nON t.id = us_title_stats.title_id;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT title.production_year AS prod_year, title.id AS title_id, COUNT(DISTINCT title.id) AS amount_of_titles\nFROM title\nJOIN movie_companies ON title.id = movie_companies.movie_id\nJOIN company_name ON company_name.id = movie_companies.company_id\nWHERE company_name.country_code = '[us]'\nAND title.production_year BETWEEN 2005 AND 2010\nGROUP BY 1, 2;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 19,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP VIEW IF EXISTS flight_departure;",
+              "CREATE VIEW flight_departure AS\nSELECT bl.flight_id,\ndeparture_airport,\nCOALESCE(actual_departure, scheduled_departure)::date AS departure_date,\nCOUNT(DISTINCT passenger_id) AS num_passengers\nFROM booking b\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN passenger p USING (booking_id)\nGROUP BY 1,2,3;"
+            ],
+            "query_script": "SELECT flight_id\nFROM flight_departure\nWHERE departure_airport='ORD';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT flight_id FROM flight\nWHERE departure_airport='ORD'\nAND flight_id IN (SELECT flight_id FROM booking_leg);",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [
+              "DROP VIEW IF EXISTS movie_company_infos;",
+              "CREATE VIEW movie_company_infos AS \nSELECT t.id as title_id, t.title, t.production_year, mi.info\nFROM title AS t\nJOIN movie_info AS mi ON t.id = mi.movie_id\nJOIN movie_companies AS mc ON t.id = mc.movie_id\nJOIN company_type AS ct ON mc.company_type_id = ct.id;"
+            ],
+            "query_script": "SELECT title_id, info FROM movie_company_infos\nWHERE production_year = 2000\nGROUP BY 1,2\nORDER BY title_id;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT t.id, mi.info\nFROM title AS t\nJOIN movie_info AS mi ON t.id = mi.movie_id\nWHERE production_year = 2000\nGROUP BY 1,2\nORDER BY t.id;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 20,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT bl.flight_id,\ndeparture_airport,\nCOALESCE(actual_departure,\nscheduled_departure)::date departure_date,\nCOUNT(DISTINCT passenger_id) AS num_passengers\nFROM booking b\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN passenger p USING (booking_id)\nWHERE (actual_departure BETWEEN '2020-08-01' AND '2020-08-02')\nOR (actual_departure IS NULL AND scheduled_departure\nBETWEEN '2020-08-02' AND '2020-08-02')\nGROUP BY 1,2,3;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "DROP MATERIALIZED VIEW IF EXISTS flight_departure_prev_day;",
+              "CREATE MATERIALIZED VIEW flight_departure_prev_day AS\nSELECT bl.flight_id,\ndeparture_airport,\nCOALESCE(actual_departure,\nscheduled_departure)::date departure_date,\nCOUNT(DISTINCT passenger_id) AS num_passengers\nFROM booking b\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN passenger p USING (booking_id)\nWHERE (actual_departure BETWEEN '2020-08-01' AND '2020-08-02')\nOR (actual_departure IS NULL AND scheduled_departure\nBETWEEN '2020-08-02' AND '2020-08-02')\nGROUP BY 1,2,3;"
+            ],
+            "query_script": "SELECT * FROM flight_departure_prev_day;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT t.title AS movie_title, MAX(mi_idx.info) AS max_rating, t.id AS title_id, t.production_year\nFROM info_type it\nJOIN movie_info_idx mi_idx ON it.id = mi_idx.info_type_id\nJOIN title t ON t.id = mi_idx.movie_id\nWHERE it.info = 'rating'\nAND t.production_year = 2012\nGROUP BY movie_title, t.id;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [
+              "DROP MATERIALIZED VIEW IF EXISTS max_title_rating_2012;",
+              "CREATE MATERIALIZED VIEW max_title_rating_2012 AS\nSELECT t.title AS movie_title, MAX(mi_idx.info) AS max_rating, t.id AS title_id, t.production_year\nFROM info_type it\nJOIN movie_info_idx mi_idx ON it.id = mi_idx.info_type_id\nJOIN title t ON t.id = mi_idx.movie_id\nWHERE it.info = 'rating'\nAND t.production_year = 2012\nGROUP BY movie_title, t.id;"
+            ],
+            "query_script": "SELECT * FROM max_title_rating_2012;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 21,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": ["CREATE OR REPLACE FUNCTION num_passengers(p_flight_id int) RETURNS integer\nAS\n$$BEGIN\nRETURN (\nSELECT COUNT(*) FROM booking_leg bl\nJOIN booking b USING (booking_id)\nJOIN passenger p USING (booking_id)\nWHERE flight_id=p_flight_id);\nEND;\n$$ LANGUAGE plpgsql;"],
+            "query_script": "SELECT flight_id, num_passengers(flight_id) AS num_pass\nFROM flight f\nWHERE departure_airport='ORD'\nAND scheduled_departure BETWEEN '2020-07-05' AND '2020-07-13';",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT f.flight_id, COUNT(*) AS num_pass\nFROM booking_leg bl\nJOIN booking b USING (booking_id)\nJOIN passenger p USING (booking_id)\nJOIN flight f USING (flight_id)\nWHERE departure_airport='ORD'\nAND scheduled_departure BETWEEN '2020-07-05' AND '2020-07-13'\nGROUP BY 1;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 22,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": ["CREATE OR REPLACE FUNCTION age_category (p_age int)\nRETURNS TEXT language plpgsql AS\n$body$\nBEGIN\nRETURN (CASE\nWHEN p_age <= 2 THEN 'Infant'\nWHEN p_age <= 12 THEN 'Child'\nWHEN p_age < 65 THEN 'Adult'\nELSE 'Senior' END);\nEND; $body$;"],
+            "query_script": "SELECT passenger_id, age_category(age)\nFROM passenger\nLIMIT 5000000;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT passenger_id,\nCASE\nWHEN age <= 2 THEN 'Infant'\nWHEN age <= 12 THEN 'Child'\nWHEN age < 65 THEN 'Adult'\nELSE 'Senior'\nEND FROM passenger LIMIT 5000000;",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": ["CREATE OR REPLACE FUNCTION company_from (p_country_code text)\nRETURNS TEXT language plpgsql AS\n$body$\nBEGIN\nRETURN (CASE\nWHEN p_country_code = '[null]' THEN 'Unknown'\nWHEN p_country_code = '[en]' THEN 'USA'\nWHEN p_country_code = '[gb]' THEN 'Great Britain'\nWHEN p_country_code = '[de]' THEN 'Germany'\nWHEN p_country_code = '[sp]' THEN 'Spain'\nWHEN p_country_code = '[it]' THEN 'Italy'\nWHEN p_country_code = '[fr]' THEN 'France'\nWHEN p_country_code = '[ca]' THEN 'Canada'\nWHEN p_country_code = '[jp]' THEN 'Japan'\nELSE 'Other' END);\nEND; $body$;"],
+            "query_script": "SELECT id, name, company_from(country_code)\nFROM company_name;",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "SELECT id, name, \nCASE\nWHEN country_code = '[null]' THEN 'Unknown'\nWHEN country_code = '[en]' THEN 'USA'\nWHEN country_code = '[gb]' THEN 'Great Britain'\nWHEN country_code = '[de]' THEN 'Germany'\nWHEN country_code = '[sp]' THEN 'Spain'\nWHEN country_code = '[it]' THEN 'Italy'\nWHEN country_code = '[fr]' THEN 'France'\nWHEN country_code = '[ca]' THEN 'Canada'\nWHEN country_code = '[jp]' THEN 'Japan'\nELSE 'Other' END \nFROM company_name;",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
     "method_id": 0,
     "method_data": [
       {
@@ -254,9 +886,42 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [
-              ""
-            ],
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "method_id": 0,
+    "method_data": [
+      {
+        "database_name": "postgres_air",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          },
+          {
+            "setup_scripts": [],
+            "query_script": "",
+            "cleanup_scripts": []
+          }
+        ]
+      },
+      {
+        "database_name": "imdb_old",
+        "baseline_and_variations": [
+          {
+            "setup_scripts": [],
             "query_script": "",
             "cleanup_scripts": []
           },
