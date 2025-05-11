@@ -223,12 +223,15 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT  MIN(n.name) AS member_in_charnamed_movie, MIN(n.name) AS a1\nFROM cast_info AS ci,\ncompany_name AS cn,\nkeyword AS k,\nmovie_companies AS mc,\nmovie_keyword AS mk,\nname AS n,\ntitle AS t\nWHERE k.keyword ='character-name-in-title'\nAND n.name LIKE 'X%'\nAND n.id = ci.person_id\nAND ci.movie_id = t.id\nAND t.id = mk.movie_id\nAND mk.keyword_id = k.id\nAND t.id = mc.movie_id\nAND mc.company_id = cn.id\nAND ci.movie_id = mc.movie_id\nAND ci.movie_id = mk.movie_id\nAND mc.movie_id = mk.movie_id;",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": [
+              "CREATE TEMP TABLE temp1 AS\nSELECT mk.movie_id\nFROM keyword AS k,\nmovie_keyword AS mk\nWHERE mk.keyword_id = k.id\nAND k.keyword ='character-name-in-title';",
+              "SELECT MIN(n.name) AS member_in_charnamed_movie, MIN(n.name) AS a1\nFROM cast_info AS ci,\ncompany_name AS cn,\nmovie_companies AS mc,\nname AS n,\ntitle AS t,\ntemp1\nWHERE n.name LIKE 'X%'\nAND n.id = ci.person_id\nAND ci.movie_id = t.id\nAND t.id = temp1.movie_id\nAND t.id = mc.movie_id\nAND mc.company_id = cn.id\nAND ci.movie_id = mc.movie_id\nAND ci.movie_id = temp1.movie_id\nAND mc.movie_id = temp1.movie_id;"
+            ],
             "cleanup_scripts": []
           }
         ]
@@ -238,12 +241,15 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT passenger_id FROM\nbooking bk\nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nJOIN account a USING (account_id)\nJOIN frequent_flyer USING (frequent_flyer_id)\nJOIN passenger ps ON ps.booking_id=bk.booking_id\nWHERE level = 4\nAND leg_num = 3\nAND is_returning IS true\nAND departure_airport = 'ABV'\nAND scheduled_departure BETWEEN '2020-07-01' AND '2020-07-08'\nORDER BY 1;",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": [
+              "CREATE TEMP TABLE temp_leg_flights AS\nSELECT \nbooking_id,\nleg_num,\nis_returning,\nbooking_leg.flight_id AS bl_flight_id,\nflight.flight_id AS flight_flight_id,\ndeparture_airport,\nscheduled_departure,\narrival_airport\nFROM booking_leg\nJOIN flight USING (flight_id)\nWHERE leg_num = 3\nAND is_returning IS true\nAND departure_airport = 'ABV'\nAND scheduled_departure BETWEEN '2020-07-01' AND '2020-07-08';",
+              "SELECT ps.passenger_id\nFROM booking\nJOIN temp_leg_flights USING (booking_id)\nJOIN account USING (account_id)\nJOIN frequent_flyer USING (frequent_flyer_id)\nJOIN passenger ps ON ps.booking_id = booking.booking_id\nWHERE level = 4\nORDER BY 1;"
+            ],
             "cleanup_scripts": []
           }
         ]
@@ -965,12 +971,12 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT * FROM account ORDER BY first_name, last_name;",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": ["SET work_mem TO '1 GB';"],
+            "query_script": "SELECT * FROM account ORDER BY first_name, last_name;",
             "cleanup_scripts": []
           }
         ]
@@ -979,13 +985,13 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": ["SET work_mem TO '1 GB';"],
+            "query_script": "SELECT * FROM company_name ORDER BY name, country_code;",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT * FROM company_name ORDER BY name, country_code;",
             "cleanup_scripts": []
           }
         ]
@@ -1000,12 +1006,12 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT COUNT(*) FROM passenger;",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": ["SET max_parallel_workers_per_gather TO 10;"],
+            "query_script": "SELECT COUNT(*) FROM passenger;",
             "cleanup_scripts": []
           }
         ]
@@ -1015,12 +1021,12 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT COUNT(*) FROM name;",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": ["SET max_parallel_workers_per_gather TO 10;"],
+            "query_script": "SELECT COUNT(*) FROM name;",
             "cleanup_scripts": []
           }
         ]
@@ -1035,12 +1041,12 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT * FROM flight \nWHERE departure_airport = 'ATL' \nAND status = 'Delayed'\nORDER BY flight_id\nLIMIT 50\nOFFSET 1000;",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT * FROM flight \nWHERE departure_airport = 'ATL' \nAND status = 'Delayed'\nAND flight_id > 160384\nORDER BY flight_id\nLIMIT 50;",
             "cleanup_scripts": []
           }
         ]
@@ -1050,12 +1056,12 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT * FROM title\nWHERE season_nr = 1\nAND production_year BETWEEN 2002 AND 2008\nORDER BY id \nLIMIT 100\nOFFSET 5000;",
             "cleanup_scripts": []
           },
           {
             "setup_scripts": [],
-            "query_script": "",
+            "query_script": "SELECT * FROM title\nWHERE season_nr = 1\nAND production_year BETWEEN 2002 AND 2008\nAND id > 54352\nORDER BY id \nLIMIT 100;",
             "cleanup_scripts": []
           }
         ]
@@ -1069,13 +1075,21 @@
         "database_name": "postgres_air",
         "baseline_and_variations": [
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS flight_status_actual_departure;",
+              "CREATE INDEX IF NOT EXISTS flight_status ON flight (status);",
+              "CREATE INDEX IF NOT EXISTS flight_actual_departure ON flight(actual_departure);"
+            ],
+            "query_script": "SELECT * FROM flight \nWHERE status = 'Delayed'\nAND actual_departure BETWEEN '2020-05-10' AND '2020-10-15';",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS flight_status;",
+              "DROP INDEX IF EXISTS flight_actual_departure;",
+              "CREATE INDEX IF NOT EXISTS flight_status_actual_departure on flight (status, actual_departure);"
+            ],
+            "query_script": "SELECT * FROM flight \nWHERE status = 'Delayed'\nAND actual_departure BETWEEN '2020-05-10' AND '2020-10-15';",
             "cleanup_scripts": []
           }
         ]
@@ -1084,13 +1098,21 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS aka_title_production_year_note_text_pattern;",
+              "CREATE INDEX IF NOT EXISTS aka_title_production_year ON aka_title(production_year);",
+              "CREATE INDEX IF NOT EXISTS aka_title_note_text_pattern ON aka_title(note text_pattern_ops);"
+            ],
+            "query_script": "SELECT * FROM aka_title\nWHERE production_year BETWEEN 1980 AND 2000\nAND note LIKE '(Argentina%';",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_scripts": [
+              "DROP INDEX IF EXISTS aka_title_production_year;",
+              "DROP INDEX IF EXISTS aka_title_note_text_pattern;",
+              "CREATE INDEX IF NOT EXISTS aka_title_production_year_note_text_pattern on aka_title(production_year, note text_pattern_ops);"
+            ],
+            "query_script": "SELECT * FROM aka_title\nWHERE production_year BETWEEN 1980 AND 2000\nAND note LIKE '(Argentina%';",
             "cleanup_scripts": []
           }
         ]
