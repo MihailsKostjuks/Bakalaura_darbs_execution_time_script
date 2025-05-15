@@ -1,7 +1,7 @@
 import csv
 import os
 
-results_path = "results/benchmark_results.csv"
+results_folder_path = "results/methods"
 
 fieldnames = [
     "Method id",
@@ -15,10 +15,19 @@ fieldnames = [
     "3rd run (ms)",
     "4th run (ms)",
     "5th run (ms)",
+    "6th run (ms)",
+    "7th run (ms)",
+    "8th run (ms)",
+    "9th run (ms)",
+    "10th run (ms)",
     "Average (ms)"
 ]
 
-def write_result(results):
+def get_filename(method_id: int) -> str:
+    return f"{results_folder_path}/method_{method_id}.csv"
+
+def write_result(method_id: int, results):
+    results_path = get_filename(method_id)
     file_exists = os.path.isfile(results_path)
     is_empty = not file_exists or os.path.getsize(results_path) == 0
 
@@ -30,7 +39,8 @@ def write_result(results):
 
         writer.writerows(results)
 
-def read_existing_results():
+def read_existing_results(method_id: int):
+    results_path = get_filename(method_id)
     existing = set()
     try:
         with open(results_path, "r", newline='') as csvfile:
@@ -42,7 +52,8 @@ def read_existing_results():
         pass
     return existing
 
-def sort_results_by_method_id_and_variant_id():
+def sort_results_by_method_id_and_variant_id(method_id: int):
+    results_path = get_filename(method_id)
     if not os.path.isfile(results_path):
         print(f"File {results_path} does not exist")
         return
