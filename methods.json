@@ -11,6 +11,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["SET enable_seqscan = OFF;"],
             "query_script": "SELECT \nMIN(mc.note) AS production_note,\nMIN(t.title) AS movie_title,\nMIN(t.production_year) AS movie_year\nFROM \ncompany_type AS ct,\ninfo_type AS it,\nmovie_companies AS mc,\nmovie_info_idx AS mi_idx,\ntitle AS t\nWHERE ct.kind = 'production companies'\nAND it.info = 'top 250 rank'\nAND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'\nAND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')\nAND ct.id = mc.company_type_id\nAND t.id = mc.movie_id\nAND t.id = mi_idx.movie_id\nAND mc.movie_id = mi_idx.movie_id\nAND it.id = mi_idx.info_type_id;",
             "cleanup_scripts": []
@@ -21,11 +22,12 @@
         "database_name": "postgres_air",
         "baseline_and_variations": [
           {
-            "setup_scripts": [""],
+            "setup_scripts": [],
             "query_script": "SELECT * FROM flight\nJOIN aircraft ON aircraft_code = code\nJOIN airport ON departure_airport = airport_code\nJOIN booking_leg USING (flight_id)\nJOIN booking USING (booking_id)\nWHERE range BETWEEN 3000 AND 7000 \nAND airport.continent = 'AS'\nAND booking.price < 300\nAND status = 'Delayed';",
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["SET enable_seqscan = OFF;"],
             "query_script": "SELECT * FROM flight\nJOIN aircraft ON aircraft_code = code\nJOIN airport ON departure_airport = airport_code\nJOIN booking_leg USING (flight_id)\nJOIN booking USING (booking_id)\nWHERE range BETWEEN 3000 AND 7000 \nAND airport.continent = 'AS'\nAND booking.price < 300\nAND status = 'Delayed';",
             "cleanup_scripts": []
@@ -46,6 +48,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["SET enable_hashjoin = OFF;"],
             "query_script": "SELECT \nMIN(mc.note) AS production_note,\nMIN(t.title) AS movie_title,\nMIN(t.production_year) AS movie_year\nFROM \ncompany_type AS ct,\ninfo_type AS it,\nmovie_companies AS mc,\nmovie_info_idx AS mi_idx,\ntitle AS t\nWHERE ct.kind = 'production companies'\nAND it.info = 'top 250 rank'\nAND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'\nAND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')\nAND ct.id = mc.company_type_id\nAND t.id = mc.movie_id\nAND t.id = mi_idx.movie_id\nAND mc.movie_id = mi_idx.movie_id\nAND it.id = mi_idx.info_type_id;",
             "cleanup_scripts": []
@@ -61,6 +64,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["SET enable_hashjoin = OFF;"],
             "query_script": "SELECT * FROM flight\nJOIN aircraft ON aircraft_code = code\nJOIN airport ON departure_airport = airport_code\nJOIN booking_leg USING (flight_id)\nJOIN booking USING (booking_id)\nJOIN passenger USING (booking_id)\nJOIN account ON passenger.account_id = account.account_id\nWHERE price BETWEEN 500 AND 1000\nAND continent = 'EU'\nAND LOWER(account.first_name) LIKE 'john%';",
             "cleanup_scripts": []
@@ -975,6 +979,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["SET work_mem TO '1 GB';"],
             "query_script": "SELECT * FROM account ORDER BY first_name, last_name;",
             "cleanup_scripts": []
@@ -985,12 +990,13 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": ["SET work_mem TO '1 GB';"],
+            "setup_scripts": [],
             "query_script": "SELECT * FROM company_name ORDER BY name, country_code;",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
+            "setup_same_session": true,
+            "setup_scripts": ["SET work_mem TO '1 GB';"],
             "query_script": "SELECT * FROM company_name ORDER BY name, country_code;",
             "cleanup_scripts": []
           }
@@ -1010,6 +1016,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["SET max_parallel_workers_per_gather TO 10;"],
             "query_script": "SELECT COUNT(*) FROM passenger;",
             "cleanup_scripts": []
@@ -1025,6 +1032,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["SET max_parallel_workers_per_gather TO 10;"],
             "query_script": "SELECT COUNT(*) FROM name;",
             "cleanup_scripts": []
