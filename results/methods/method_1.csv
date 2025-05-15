@@ -1,0 +1,57 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms)
+1,imdb_old,original,1,Baseline,"SELECT 
+MIN(mc.note) AS production_note,
+MIN(t.title) AS movie_title,
+MIN(t.production_year) AS movie_year
+FROM 
+company_type AS ct,
+info_type AS it,
+movie_companies AS mc,
+movie_info_idx AS mi_idx,
+title AS t
+WHERE ct.kind = 'production companies'
+AND it.info = 'top 250 rank'
+AND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'
+AND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')
+AND ct.id = mc.company_type_id
+AND t.id = mc.movie_id
+AND t.id = mi_idx.movie_id
+AND mc.movie_id = mi_idx.movie_id
+AND it.id = mi_idx.info_type_id;",152.875,138.341,96.985,172.478,146.313,165.753,150.021,99.562,99.967,144.461,136.68
+1,imdb_old,original,2,Solution 1,"SELECT 
+MIN(mc.note) AS production_note,
+MIN(t.title) AS movie_title,
+MIN(t.production_year) AS movie_year
+FROM 
+company_type AS ct,
+info_type AS it,
+movie_companies AS mc,
+movie_info_idx AS mi_idx,
+title AS t
+WHERE ct.kind = 'production companies'
+AND it.info = 'top 250 rank'
+AND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%'
+AND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%')
+AND ct.id = mc.company_type_id
+AND t.id = mc.movie_id
+AND t.id = mi_idx.movie_id
+AND mc.movie_id = mi_idx.movie_id
+AND it.id = mi_idx.info_type_id;",6.774,6.781,6.825,6.773,6.82,6.828,6.77,6.77,6.765,6.815,6.79
+1,postgres_air,reproduced,1,Baseline,"SELECT * FROM flight
+JOIN aircraft ON aircraft_code = code
+JOIN airport ON departure_airport = airport_code
+JOIN booking_leg USING (flight_id)
+JOIN booking USING (booking_id)
+WHERE range BETWEEN 3000 AND 7000 
+AND airport.continent = 'AS'
+AND booking.price < 300
+AND status = 'Delayed';",3880.922,3920.659,3971.306,3768.999,3860.56,3807.185,3814.352,3908.073,3824.215,3832.569,3858.88
+1,postgres_air,reproduced,2,Solution 1,"SELECT * FROM flight
+JOIN aircraft ON aircraft_code = code
+JOIN airport ON departure_airport = airport_code
+JOIN booking_leg USING (flight_id)
+JOIN booking USING (booking_id)
+WHERE range BETWEEN 3000 AND 7000 
+AND airport.continent = 'AS'
+AND booking.price < 300
+AND status = 'Delayed';",17776.473,17695.48,17526.708,17547.275,17510.488,17587.38,17743.927,17817.219,17477.205,17536.655,17621.88
