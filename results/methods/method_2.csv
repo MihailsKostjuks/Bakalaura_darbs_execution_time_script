@@ -1,5 +1,5 @@
 Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
-1,imdb_old,original,1,Baseline,"SELECT 
+2,imdb_old,original,1,Baseline,"SELECT 
 MIN(mc.note) AS production_note,
 MIN(t.title) AS movie_title,
 MIN(t.production_year) AS movie_year
@@ -17,8 +17,8 @@ AND ct.id = mc.company_type_id
 AND t.id = mc.movie_id
 AND t.id = mi_idx.movie_id
 AND mc.movie_id = mi_idx.movie_id
-AND it.id = mi_idx.info_type_id;",106.435,103.565,175.824,105.942,147.669,110.627,147.724,148.156,174.978,102.293,132.32,
-1,imdb_old,original,2,Solution 1,"SELECT 
+AND it.id = mi_idx.info_type_id;",106.128,103.116,153.325,114.331,107.219,131.34,104.199,147.099,143.329,141.968,125.21,
+2,imdb_old,original,2,Solution 1,"SELECT 
 MIN(mc.note) AS production_note,
 MIN(t.title) AS movie_title,
 MIN(t.production_year) AS movie_year
@@ -36,22 +36,24 @@ AND ct.id = mc.company_type_id
 AND t.id = mc.movie_id
 AND t.id = mi_idx.movie_id
 AND mc.movie_id = mi_idx.movie_id
-AND it.id = mi_idx.info_type_id;",6.816,6.904,6.868,6.861,7.083,6.812,6.859,6.904,6.848,6.904,6.89,94.79292623941959
-1,postgres_air,reproduced,1,Baseline,"SELECT * FROM flight
+AND it.id = mi_idx.info_type_id;",6.859,6.77,6.891,6.891,6.915,6.926,6.86,6.856,6.93,6.865,6.88,94.50523121156458
+2,postgres_air,reproduced,1,Baseline,"SELECT * FROM flight
 JOIN aircraft ON aircraft_code = code
 JOIN airport ON departure_airport = airport_code
 JOIN booking_leg USING (flight_id)
 JOIN booking USING (booking_id)
-WHERE range BETWEEN 3000 AND 7000 
-AND airport.continent = 'AS'
-AND booking.price < 300
-AND status = 'Delayed';",1855.636,1853.024,1857.263,1854.018,1881.421,1905.927,1851.978,1873.1,1826.197,1887.346,1864.59,
-1,postgres_air,reproduced,2,Solution 1,"SELECT * FROM flight
+JOIN passenger USING (booking_id)
+JOIN account ON passenger.account_id = account.account_id
+WHERE price BETWEEN 500 AND 1000
+AND continent = 'EU'
+AND LOWER(account.first_name) LIKE 'john%';",1203.412,1211.108,1208.172,1254.522,1228.272,1183.789,1226.966,1197.312,1246.987,1174.214,1213.48,
+2,postgres_air,reproduced,2,Solution 1,"SELECT * FROM flight
 JOIN aircraft ON aircraft_code = code
 JOIN airport ON departure_airport = airport_code
 JOIN booking_leg USING (flight_id)
 JOIN booking USING (booking_id)
-WHERE range BETWEEN 3000 AND 7000 
-AND airport.continent = 'AS'
-AND booking.price < 300
-AND status = 'Delayed';",2054.647,2045.489,2058.873,2072.657,2106.888,2064.848,2094.083,2041.337,2030.776,2051.635,2062.12,-10.593749832402832
+JOIN passenger USING (booking_id)
+JOIN account ON passenger.account_id = account.account_id
+WHERE price BETWEEN 500 AND 1000
+AND continent = 'EU'
+AND LOWER(account.first_name) LIKE 'john%';",3236.095,3234.446,3298.656,3290.395,3207.951,3251.485,3263.556,3225.126,3208.903,3235.679,3245.23,-167.4316840821439

@@ -1,0 +1,17 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+10,postgres_air,original,1,Baseline,"SELECT * FROM flight
+WHERE COALESCE(actual_departure, scheduled_departure) BETWEEN '2020-08-17' AND '2020-08-18'",161.496,149.479,64.943,135.037,145.362,156.086,151.234,66.972,65.176,62.048,115.78,
+10,postgres_air,original,2,Solution 1,"SELECT * FROM flight
+WHERE (actual_departure BETWEEN '2020-08-17' AND '2020-08-18')
+OR (
+actual_departure IS NULL
+AND scheduled_departure BETWEEN '2020-08-17' AND '2020-08-18'
+);",1.256,1.263,1.251,1.265,1.244,1.259,1.265,1.261,1.263,1.261,1.26,98.9117291414752
+10,imdb_old,reproduced,1,Baseline,"SELECT * FROM company_name 
+WHERE COALESCE(name_pcode_nf, name_pcode_sf) = 'A253';",149.931,36.474,36.762,141.778,35.475,36.871,36.401,37.617,36.224,36.805,58.43,
+10,imdb_old,reproduced,2,Solution 1,"SELECT * FROM company_name 
+WHERE (name_pcode_nf = 'A253') 
+OR (
+name_pcode_nf IS NULL
+AND name_pcode_sf = 'A253'
+);",0.2,0.211,0.356,0.204,0.196,0.198,0.209,0.215,0.196,0.199,0.22,99.62348108848195

@@ -1,0 +1,7 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+11,postgres_air,original,1,Baseline,SELECT * FROM account WHERE LOWER(last_name) LIKE 'johns%';,91.649,91.213,140.742,92.349,147.138,90.837,92.489,144.902,143.156,151.342,118.58,
+11,postgres_air,original,2,Solution 1,SELECT * FROM account WHERE (LOWER(last_name) >='johns' AND LOWER(last_name) < 'johnt');,4.192,4.1,4.12,4.005,4.151,4.037,4.026,4.042,4.089,4.017,4.08,96.55928487097319
+11,postgres_air,original,3,Solution 2,SELECT * FROM account WHERE LOWER(last_name) LIKE 'johns%';,5.891,5.846,5.813,5.817,5.765,6.6,5.728,5.736,5.838,5.779,5.88,95.0413223140496
+11,imdb_old,reproduced,1,Baseline,SELECT * FROM title WHERE LOWER(title) LIKE 'the best%',1032.449,1019.828,1041.247,995.692,968.254,981.684,970.547,985.606,996.479,1049.94,1004.17,
+11,imdb_old,reproduced,2,Solution 1,SELECT * FROM title WHERE (LOWER(title) >='the best' AND LOWER(title) < 'the besu');,2.527,2.529,2.504,2.569,2.468,2.5,2.583,2.541,2.595,2.522,2.53,99.74805062887758
+11,imdb_old,reproduced,3,Solution 2,SELECT * FROM title WHERE LOWER(title) LIKE 'the best%';,4.39,4.644,4.435,4.471,4.417,4.466,4.397,4.45,4.423,4.366,4.45,99.55684794407321

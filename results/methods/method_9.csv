@@ -1,0 +1,7 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+9,postgres_air,original,1,Baseline,"SELECT * FROM flight
+WHERE scheduled_departure ::date BETWEEN '2020-08-17' AND '2020-08-18'",155.511,140.766,143.31,145.601,151.232,145.025,83.871,83.841,146.609,78.251,127.4,
+9,postgres_air,original,2,Solution 1,"SELECT * FROM flight
+WHERE scheduled_departure BETWEEN '2020-08-17' AND '2020-08-19';",1.373,1.35,1.354,1.353,1.357,1.362,1.352,1.354,1.387,1.345,1.36,98.93249607535321
+9,imdb_old,reproduced,1,Baseline,SELECT * FROM aka_title WHERE production_year::text = '2011';,137.851,57.063,55.788,148.469,155.075,152.488,143.507,63.966,146.283,143.034,120.35,
+9,imdb_old,reproduced,2,Solution 1,SELECT * FROM aka_title WHERE production_year = 2011;,9.825,10.265,9.528,9.367,9.455,9.419,9.387,9.42,9.529,9.508,9.57,92.04819277108435

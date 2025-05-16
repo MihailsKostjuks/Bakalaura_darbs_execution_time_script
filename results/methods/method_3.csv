@@ -1,0 +1,9 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+3,imdb_stokholm,original,1,Baseline,"SELECT COUNT (DISTINCT title_id) FROM titles
+WHERE type IN ('movie', 'video');",1137.891,1047.106,1002.542,1150.901,1037.175,1007.17,1035.216,1085.196,1029.587,1024.711,1055.75,
+3,imdb_stokholm,original,2,Solution 1,"SELECT COUNT (title_id) FROM titles
+WHERE type IN ('movie', 'video');",221.897,187.768,191.796,218.484,224.506,189.525,262.762,203.492,197.526,187.193,208.49,80.25195358749704
+3,postgres_air,reproduced,1,Baseline,"SELECT COUNT (DISTINCT phone_id) FROM phone 
+WHERE phone_type IN ('home', 'work');",99.74,95.915,98.689,96.825,96.803,95.325,97.264,99.699,96.79,96.829,97.39,
+3,postgres_air,reproduced,2,Solution 1,"SELECT COUNT (phone_id) FROM phone 
+WHERE phone_type IN ('home', 'work');",52.85,51.513,152.846,143.33,136.736,145.713,145.321,51.308,149.895,145.687,117.52,-20.669473251873903

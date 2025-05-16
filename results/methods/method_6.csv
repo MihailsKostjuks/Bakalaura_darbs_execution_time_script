@@ -1,0 +1,20 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+6,imdb_stokholm,original,1,Baseline,"SELECT primary_title , premiered
+FROM titles
+WHERE type LIKE 'movie'
+AND premiered BETWEEN 2000 AND 2010
+ORDER BY premiered ASC;",194.183,173.983,240.207,175.802,178.418,181.811,204.837,177.814,199.118,241.772,196.79,
+6,imdb_stokholm,original,2,Solution 1,"SELECT primary_title , premiered
+FROM titles
+WHERE type = 'movie'
+AND premiered BETWEEN 2000 AND 2010
+ORDER BY premiered ASC;",177.796,192.149,193.342,187.11,195.029,167.1,191.799,197.964,221.811,172.349,189.64,3.6333147009502547
+6,postgres_air,reproduced,1,Baseline,"SELECT phone, phone_type, primary_phone FROM phone
+WHERE phone_type LIKE 'mobile'
+AND LENGTH(phone) = 10
+ORDER BY phone;
+",150.262,163.888,154.962,146.103,158.379,163.797,160.357,145.243,155.539,159.039,155.76,
+6,postgres_air,reproduced,2,Solution 1,"SELECT phone, phone_type, primary_phone FROM phone
+WHERE phone_type = 'mobile'
+AND LENGTH(phone) = 10
+ORDER BY phone;",162.517,155.386,149.555,158.398,154.827,154.6,150.954,146.82,155.464,154.136,154.27,0.956599897277851

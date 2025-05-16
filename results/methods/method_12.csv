@@ -1,0 +1,32 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+12,postgres_air,original,1,Baseline,"SELECT bp.update_ts Boarding_pass_issued,
+ scheduled_departure,
+ actual_departure,
+ status
+FROM flight f
+JOIN booking_leg bl USING (flight_id)
+JOIN boarding_pass bp USING (booking_leg_id)
+WHERE bp.update_ts > scheduled_departure + interval '30 minutes'
+AND f.update_ts >= scheduled_departure - interval '1 hour';",10163.022,21195.243,21457.346,12006.589,30497.464,21229.533,11795.053,22999.526,22165.222,21904.344,19541.33,
+12,postgres_air,original,2,Solution 1,"SELECT bp.update_ts Boarding_pass_issued,
+ scheduled_departure,
+ actual_departure,
+ status
+FROM flight f
+JOIN booking_leg bl USING (flight_id)
+JOIN boarding_pass bp USING (booking_leg_id)
+WHERE bp.update_ts > scheduled_departure + interval '30 minutes'
+AND f.update_ts >= scheduled_departure - interval '1 hour'
+AND bp.update_ts >= '2020-08-16' 
+AND bp.update_ts < '2020-08-20';",156.067,48.532,139.819,140.914,48.151,50.239,146.559,150.598,50.505,142.591,107.4,99.45039564860733
+12,imdb_old,reproduced,1,Baseline,"SELECT *
+FROM title
+JOIN movie_companies ON title.id = movie_companies.movie_id
+JOIN company_name ON company_name.id = movie_companies.company_id
+WHERE company_name.country_code = '[us]';",2806.036,2843.87,3512.249,8536.727,2790.977,3073.623,11264.224,2890.382,2853.717,8500.865,4907.27,
+12,imdb_old,reproduced,2,Solution 1,"SELECT *
+FROM title
+JOIN movie_companies ON title.id = movie_companies.movie_id
+JOIN company_name ON company_name.id = movie_companies.company_id
+WHERE company_name.country_code = '[us]'
+AND title.production_year = 2010;",469.15,467.302,426.786,448.734,439.389,422.651,426.528,416.644,438.647,464.049,441.99,90.99315912921034

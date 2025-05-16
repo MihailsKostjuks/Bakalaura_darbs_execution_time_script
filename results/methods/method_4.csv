@@ -1,0 +1,15 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+4,imdb_stokholm,original,1,Baseline,"SELECT type , COUNT(*)
+FROM titles
+GROUP BY (type)
+ORDER BY (type) ASC;",268.032,289.381,267.116,266.226,258.383,290.751,290.217,269.359,261.478,299.402,276.03,
+4,imdb_stokholm,original,2,Solution 1,"SELECT type , COUNT(title_id)
+FROM titles
+GROUP BY (type)
+ORDER BY (type) ASC;",261.688,317.971,298.073,260.823,260.588,335.699,301.537,262.241,259.264,289.626,284.75,-3.1590769119298727
+4,postgres_air,reproduced,1,Baseline,"SELECT level, COUNT(*) FROM frequent_flyer
+GROUP BY level
+ORDER BY level ASC;",31.011,31.019,30.61,30.494,30.35,30.813,30.954,31.468,30.729,30.824,30.83,
+4,postgres_air,reproduced,2,Solution 1,"SELECT level, COUNT(frequent_flyer_id) FROM frequent_flyer
+GROUP BY level
+ORDER BY level ASC;",31.557,32.512,32.302,31.352,31.889,31.74,31.472,31.76,32.187,31.54,31.83,-3.2435939020434645

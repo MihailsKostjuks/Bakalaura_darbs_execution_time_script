@@ -155,6 +155,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["DROP MATERIALIZED VIEW IF EXISTS q3;"],
             "query_script": [
               "CREATE MATERIALIZED VIEW q3\nAS\nSELECT primary_title, original_title, crew.title_id, person_id, category\nFROM crew\nINNER JOIN titles ON titles.title_id = crew.title_id\nWHERE primary_title LIKE 'Spider-Man %'\nOR original_title LIKE 'Spider-Man %';",
@@ -173,6 +174,7 @@
             "cleanup_scripts": []
           },
           {
+            "setup_same_session": true,
             "setup_scripts": ["DROP MATERIALIZED VIEW IF EXISTS booking_with_account_mv;"],
             "query_script": [
               "CREATE MATERIALIZED VIEW booking_with_account_mv\nAS \nSELECT b.booking_id, b.account_id, b.price, a.frequent_flyer_id\nFROM booking b\nINNER JOIN account a ON b.account_id = a.account_id\nWHERE b.price > 300;",
@@ -501,7 +503,8 @@
         "baseline_and_variations": [
           {
             "setup_scripts": [
-              "DROP INDEX IF EXISTS flight_canceled;"
+              "DROP INDEX IF EXISTS flight_canceled;",
+              "DROP INDEX IF EXISTS flight_status_actual_departure;"
 
             ],
             "query_script": "SELECT * FROM flight \nWHERE scheduled_departure BETWEEN '2020-08-15' AND '2024-08-18'\nAND status='Canceled';",

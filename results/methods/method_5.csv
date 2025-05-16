@@ -1,0 +1,44 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+5,imdb_stokholm,original,1,Baseline,"SELECT DISTINCT name
+FROM (
+SELECT primary_title, original_title, crew.title_id, person_id, category
+FROM crew
+INNER JOIN titles ON titles.title_id = crew.title_id
+WHERE primary_title LIKE 'Spider-Man %'
+OR original_title LIKE 'Spider-Man %'
+) AS a
+INNER JOIN people ON a.person_id = people.person_id
+WHERE a.category = 'actor'
+OR a.category = 'actress';",737.814,731.206,755.184,785.048,766.408,876.944,811.501,770.749,843.161,767.212,784.52,
+5,imdb_stokholm,original,2,Solution 1,"CREATE MATERIALIZED VIEW q3
+AS
+SELECT primary_title, original_title, crew.title_id, person_id, category
+FROM crew
+INNER JOIN titles ON titles.title_id = crew.title_id
+WHERE primary_title LIKE 'Spider-Man %'
+OR original_title LIKE 'Spider-Man %';
+
+SELECT DISTINCT name FROM people
+INNER JOIN q3 ON q3.person_id = people.person_id
+WHERE q3.category = 'actor'
+OR q3.category = 'actress';",736.4699999999999,741.6919999999999,744.9499999999999,735.069,749.1320000000001,784.442,717.011,740.164,782.795,730.0450000000001,746.18,4.887064701983382
+5,postgres_air,reproduced,1,Baseline,"SELECT DISTINCT ff.first_name, ff.last_name, booking_with_account.price
+FROM (
+SELECT b.booking_id, b.account_id, b.price, a.frequent_flyer_id
+FROM booking b
+INNER JOIN account a ON b.account_id = a.account_id
+WHERE b.price > 300
+) AS booking_with_account
+INNER JOIN frequent_flyer ff ON booking_with_account.frequent_flyer_id = ff.frequent_flyer_id
+WHERE ff.first_name LIKE 'J%';",1592.986,1602.919,1559.768,1573.134,1618.75,1547.246,1587.959,1586.362,1695.752,1552.539,1591.74,
+5,postgres_air,reproduced,2,Solution 1,"CREATE MATERIALIZED VIEW booking_with_account_mv
+AS 
+SELECT b.booking_id, b.account_id, b.price, a.frequent_flyer_id
+FROM booking b
+INNER JOIN account a ON b.account_id = a.account_id
+WHERE b.price > 300;
+
+SELECT DISTINCT ff.first_name, ff.last_name, booking_with_account_mv.price
+FROM booking_with_account_mv
+INNER JOIN frequent_flyer ff ON booking_with_account_mv.frequent_flyer_id = ff.frequent_flyer_id
+WHERE ff.first_name LIKE 'J%';",10601.594,18225.632,12686.143,11052.632,11153.749,16141.357,14991.827000000001,15804.325,11132.901,14293.304,13608.35,-754.935479412467

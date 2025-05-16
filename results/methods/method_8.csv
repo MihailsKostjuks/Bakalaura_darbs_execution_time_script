@@ -1,0 +1,13 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+8,postgres_air,original,1,Baseline,SELECT * FROM account WHERE lower(last_name)='daniels';,88.984,91.373,90.727,109.897,90.295,99.39,89.155,141.304,141.023,90.776,103.29,
+8,postgres_air,original,2,Solution 1,"SELECT * FROM account 
+WHERE last_name='daniels'
+OR last_name='Daniels'
+OR last_name ='DANIELS';",0.759,0.822,0.698,0.702,0.691,0.706,0.687,0.703,0.701,0.723,0.72,99.302933488237
+8,postgres_air,original,3,Solution 2,SELECT * FROM account WHERE lower(last_name)='daniels';,0.673,0.701,0.699,0.685,0.678,0.693,0.695,0.687,0.688,0.682,0.69,99.33197792622714
+8,imdb_old,reproduced,1,Baseline,SELECT * FROM title WHERE lower(title)='pilot';,981.982,980.912,970.971,943.128,971.894,952.897,971.595,973.702,989.339,964.977,970.14,
+8,imdb_old,reproduced,2,Solution 1,"SELECT * FROM title 
+WHERE title='Pilot'
+OR title='PILOT'
+OR title ='pilot';",4.476,4.685,5.345,4.486,4.506,4.468,4.534,4.512,4.517,4.586,4.61,99.52481085204197
+8,imdb_old,reproduced,3,Solution 2,SELECT * FROM title WHERE lower(title)='pilot';,4.454,4.476,4.482,4.441,4.469,4.501,4.468,4.463,4.429,4.513,4.47,99.53924175892139

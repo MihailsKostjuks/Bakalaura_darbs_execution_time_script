@@ -1,0 +1,81 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+7,imdb_old,original,1,Baseline,"SELECT  MIN(n.name) AS member_in_charnamed_movie, MIN(n.name) AS a1
+FROM cast_info AS ci,
+company_name AS cn,
+keyword AS k,
+movie_companies AS mc,
+movie_keyword AS mk,
+name AS n,
+title AS t
+WHERE k.keyword ='character-name-in-title'
+AND n.name LIKE 'X%'
+AND n.id = ci.person_id
+AND ci.movie_id = t.id
+AND t.id = mk.movie_id
+AND mk.keyword_id = k.id
+AND t.id = mc.movie_id
+AND mc.company_id = cn.id
+AND ci.movie_id = mc.movie_id
+AND ci.movie_id = mk.movie_id
+AND mc.movie_id = mk.movie_id;",42835.087,21699.301,32336.097,51307.772,49030.153,107510.356,164471.604,38443.243,22170.414,18683.691,54848.77,
+7,imdb_old,original,2,Solution 1,"CREATE TEMP TABLE temp1 AS
+SELECT mk.movie_id
+FROM keyword AS k,
+movie_keyword AS mk
+WHERE mk.keyword_id = k.id
+AND k.keyword ='character-name-in-title';
+
+SELECT MIN(n.name) AS member_in_charnamed_movie, MIN(n.name) AS a1
+FROM cast_info AS ci,
+company_name AS cn,
+movie_companies AS mc,
+name AS n,
+title AS t,
+temp1
+WHERE n.name LIKE 'X%'
+AND n.id = ci.person_id
+AND ci.movie_id = t.id
+AND t.id = temp1.movie_id
+AND t.id = mc.movie_id
+AND mc.company_id = cn.id
+AND ci.movie_id = mc.movie_id
+AND ci.movie_id = temp1.movie_id
+AND mc.movie_id = temp1.movie_id;",412.382,393.149,325.993,331.12600000000003,411.922,400.531,353.48499999999996,381.649,448.145,393.59000000000003,385.2,99.29770530861495
+7,postgres_air,reproduced,1,Baseline,"SELECT passenger_id FROM
+booking bk
+JOIN booking_leg bl USING (booking_id)
+JOIN flight f USING (flight_id)
+JOIN account a USING (account_id)
+JOIN frequent_flyer USING (frequent_flyer_id)
+JOIN passenger ps ON ps.booking_id=bk.booking_id
+WHERE level = 4
+AND leg_num = 3
+AND is_returning IS true
+AND departure_airport = 'ABV'
+AND scheduled_departure BETWEEN '2020-07-01' AND '2020-07-08'
+ORDER BY 1;",4871.793,2549.792,1766.741,1625.85,1589.227,1514.887,1525.564,1492.318,1527.419,1579.765,2004.34,
+7,postgres_air,reproduced,2,Solution 1,"CREATE TEMP TABLE temp_leg_flights AS
+SELECT 
+booking_id,
+leg_num,
+is_returning,
+booking_leg.flight_id AS bl_flight_id,
+flight.flight_id AS flight_flight_id,
+departure_airport,
+scheduled_departure,
+arrival_airport
+FROM booking_leg
+JOIN flight USING (flight_id)
+WHERE leg_num = 3
+AND is_returning IS true
+AND departure_airport = 'ABV'
+AND scheduled_departure BETWEEN '2020-07-01' AND '2020-07-08';
+
+SELECT ps.passenger_id
+FROM booking
+JOIN temp_leg_flights USING (booking_id)
+JOIN account USING (account_id)
+JOIN frequent_flyer USING (frequent_flyer_id)
+JOIN passenger ps ON ps.booking_id = booking.booking_id
+WHERE level = 4
+ORDER BY 1;",2910.4649999999997,2860.864,2926.64,2876.831,2890.878,2861.2690000000002,2857.685,2829.189,2857.746,2873.7690000000002,2874.53,-43.415288823253555
