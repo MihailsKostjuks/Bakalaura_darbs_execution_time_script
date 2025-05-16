@@ -1,8 +1,10 @@
 import json
 import os
 import psycopg2
+from scipy.stats import ttest_ind
+
 from dotenv import load_dotenv
-from utils.file_operations import read_existing_results, write_result, sort_results_by_method_id_and_variant_id
+from utils.file_operations import write_result, is_method_result_present
 
 load_dotenv()
 
@@ -58,23 +60,26 @@ def execute_scripts(
     connection.commit()
     return total_execution_time
 
-
+def calculate_speed_improvement(baseline_avg: float, variation_avg: float) -> float:
+    if baseline_avg == 0:
+        raise ValueError("Baseline average runtime cannot be zero.")
+    improvement = ((baseline_avg - variation_avg) / baseline_avg) * 100
+    return improvement
 
 def process_methods():
     with open("methods.json", 'r') as f:
         methods = json.load(f)
     repetitions = 10
-    existing_results = {}
-    # existing_results = read_existing_results()
     for method in methods:
         method_id = method.get("method_id")
-        if str(method_id) in existing_results:
+        if is_method_result_present(method_id):
             print(f"Skipping method {method_id}: already in  CSV results")
             continue
         if method_id != 0: # 0 is a placeholder for upcoming methods
             for method_data_id, method_data in enumerate(method.get("method_data", []), start=1):
 
                 db_name = method_data.get("database_name", "")
+                baseline_avg_execution_speed = None
                 for variation_index, variation in enumerate(method_data.get("baseline_and_variations", []), start=1):
 
                     setup_same_session = variation.get("setup_same_session", False)
@@ -107,6 +112,15 @@ def process_methods():
 
                     average_duration = round(sum(durations) / len(durations), 2)
 
+                    if variation_index == 1:
+                        baseline_durations = durations
+                        baseline_avg_execution_speed = average_duration
+
+                    execution_speed_improvement = None
+                    if variation_index > 1:
+                        if baseline_avg_execution_speed is not None:
+                            execution_speed_improvement = calculate_speed_improvement(baseline_avg_execution_speed, average_duration)
+
                     variant_result = {
                         "Method id": method_id,
                         "Database name": db_name,
@@ -124,10 +138,11 @@ def process_methods():
                         "8th run (ms)": durations[7],
                         "9th run (ms)": durations[8],
                         "10th run (ms)": durations[9],
-                        "Average (ms)": average_duration
+                        "Average (ms)": average_duration,
+                        "Performance improvement (%)": execution_speed_improvement
                     }
                     print(durations)
-                    print(method_id, db_name, variant, average_duration)
+                    print(method_id, db_name, variant, average_duration, execution_speed_improvement)
 
                     write_result(method_id, [variant_result])
             return

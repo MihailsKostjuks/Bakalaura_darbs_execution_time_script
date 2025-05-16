@@ -20,7 +20,8 @@ fieldnames = [
     "8th run (ms)",
     "9th run (ms)",
     "10th run (ms)",
-    "Average (ms)"
+    "Average (ms)",
+    "Performance improvement (%)"
 ]
 
 def get_filename(method_id: int) -> str:
@@ -39,18 +40,9 @@ def write_result(method_id: int, results):
 
         writer.writerows(results)
 
-def read_existing_results(method_id: int):
+def is_method_result_present(method_id: int) -> bool:
     results_path = get_filename(method_id)
-    existing = set()
-    try:
-        with open(results_path, "r", newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                method_id = row["Method id"]
-                existing.add(method_id)
-    except Exception as e:
-        pass
-    return existing
+    return os.path.isfile(results_path)
 
 def sort_results_by_method_id_and_variant_id(method_id: int):
     results_path = get_filename(method_id)
