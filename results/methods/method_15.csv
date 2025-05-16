@@ -1,0 +1,11 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+15,postgres_air,original,1,Baseline,"SELECT flight_id FROM flight
+WHERE flight_id IN (SELECT flight_id FROM booking_leg);",2678.259,10212.773,2879.354,3171.94,2947.193,4063.307,8502.375,2824.178,2869.113,9875.824,5002.43,
+15,postgres_air,original,2,Solution 1,"SELECT flight_id FROM flight f
+INTERSECT
+SELECT flight_id FROM booking_leg;",6069.337,6027.019,5954.411,6051.966,6043.683,6040.604,6069.669,5952.143,5951.17,6103.801,6026.38,-20.46905204070821
+15,imdb_old,reproduced,1,Baseline,"SELECT id FROM title
+WHERE id IN (SELECT movie_id FROM aka_title);",365.48,363.482,359.43,337.844,330.338,357.013,341.691,343.604,340.424,324.393,346.37,
+15,imdb_old,reproduced,2,Solution 1,"SELECT id FROM title
+INTERSECT
+SELECT movie_id FROM aka_title;",1082.312,1082.99,1071.22,1093.383,1077.617,1054.09,1075.148,1113.845,1122.013,1095.635,1086.83,-213.77717469757772

@@ -1,0 +1,81 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+16,postgres_air,original,1,Baseline,"SELECT
+CASE
+WHEN actual_departure>scheduled_departure + interval '1 hour' THEN 'Late
+group 1'
+ELSE 'Late group 2'
+END AS grouping,
+flight_id,
+COUNT(*) AS num_passengers
+FROM boarding_pass bp
+JOIN booking_leg bl USING (booking_leg_id)
+JOIN booking b USING (booking_id)
+JOIN flight f USING (flight_id)
+WHERE departure_airport='FRA'
+AND actual_departure>'2020-07-01' AND ( (
+actual_departure>scheduled_departure + interval '30 minute'
+AND actual_departure<=scheduled_departure + interval '1 hour'
+)
+OR
+(actual_departure>scheduled_departure + interval '1 hour'
+AND bp.update_ts >scheduled_departure + interval '30 minute')
+)
+GROUP BY 1,2;",6405.418,5317.202,5891.384,5847.052,5385.176,6147.761,5368.475,6037.944,5417.927,5476.005,5729.43,
+16,postgres_air,original,2,Solution 1,"SELECT
+'Late group 1' AS grouping,
+flight_id,
+count(*) AS num_passengers
+FROM boarding_pass bp
+JOIN booking_leg bl USING (booking_leg_id)
+JOIN booking b USING (booking_id)
+JOIN flight f USING (flight_id)
+WHERE departure_airport='FRA' AND
+actual_departure>scheduled_departure + interval '1 hour' AND
+bp.update_ts > scheduled_departure + interval '30 minutes'
+AND actual_departure>'2020-07-01'
+GROUP BY 1,2
+UNION ALL
+SELECT
+'Late group 2' AS grouping,
+flight_id,
+COUNT(*) AS num_passengers
+FROM boarding_pass bp
+JOIN booking_leg bl USING(booking_leg_id)
+JOIN booking b USING (booking_id)
+JOIN flight f USING (flight_id)
+WHERE departure_airport='FRA' AND
+actual_departure>scheduled_departure + interval '30 minute'
+AND actual_departure<=scheduled_departure + interval '1 hour'
+AND actual_departure>'2020-07-01'
+GROUP BY 1,2;",11474.521,9928.333,10238.27,9514.356,9636.658,9888.309,10581.76,11389.569,10359.6,11106.131,10411.75,-81.72401094000624
+16,imdb_old,reproduced,1,Baseline,"SELECT 
+CASE WHEN c.country_code = '[es]' THEN 'Old TV movies made by Spanish companies'
+ELSE 'Modern TV movies made by Italian companies' END AS description, t.title, t.production_year
+FROM title t
+JOIN movie_companies mc ON t.id = mc.movie_id
+JOIN company_name c ON mc.company_id = c.id
+WHERE mc.note LIKE '%TV%'
+AND (
+(c.country_code = '[es]' AND t.production_year < 2000)
+OR 
+(c.country_code = '[it]' AND t.production_year > 2010)
+);",219.109,187.868,186.621,199.262,221.61,200.384,216.086,226.839,193.698,235.448,208.69,
+16,imdb_old,reproduced,2,Solution 1,"SELECT 
+'Old TV movies made by Spanish companies' AS description,
+t.title,
+t.production_year
+FROM title t
+JOIN movie_companies mc ON t.id = mc.movie_id
+JOIN company_name c ON mc.company_id = c.id
+WHERE mc.note LIKE '%TV%'
+AND c.country_code = '[es]' 
+AND t.production_year < 2000
+UNION ALL
+SELECT 
+'Modern TV movies made by Italian companies' AS description, t.title, t.production_year
+FROM title t
+JOIN movie_companies mc ON t.id = mc.movie_id
+JOIN company_name c ON mc.company_id = c.id
+WHERE mc.note LIKE '%TV%'
+AND c.country_code = '[it]' 
+AND t.production_year > 2010;",395.458,310.546,389.974,315.965,340.973,314.016,356.246,355.113,331.999,351.557,346.18,-65.88240931525229

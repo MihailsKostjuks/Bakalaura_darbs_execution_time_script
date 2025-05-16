@@ -1,0 +1,9 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+13,postgres_air,original,1,Baseline,"SELECT * FROM flight 
+WHERE scheduled_departure BETWEEN '2020-08-15' AND '2024-08-18'
+AND status='Canceled';",70.331,149.718,67.327,63.154,66.717,148.617,68.492,62.521,156.067,65.229,91.82,
+13,postgres_air,original,2,Solution 1,"SELECT * FROM flight 
+WHERE scheduled_departure BETWEEN '2020-08-15' AND '2024-08-18'
+AND status='Canceled';",0.212,0.208,0.22,0.226,0.213,0.23,0.215,0.207,0.217,0.222,0.22,99.76040078414289
+13,imdb_old,reproduced,1,Baseline,SELECT * FROM company_name WHERE country_code = '[en]';,35.508,149.711,35.748,34.961,36.18,136.682,36.118,148.478,38.413,36.611,68.84,
+13,imdb_old,reproduced,2,Solution 1,SELECT * FROM company_name WHERE country_code = '[en]';,0.094,0.045,0.044,0.042,0.042,0.073,0.043,0.044,0.041,0.043,0.05,99.92736780941314
