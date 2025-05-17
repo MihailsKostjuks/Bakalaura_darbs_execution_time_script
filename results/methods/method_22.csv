@@ -1,0 +1,26 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+22,postgres_air,original,1,Baseline,"SELECT passenger_id, age_category(age)
+FROM passenger
+LIMIT 5000000;",4753.503,4288.531,3862.995,4172.255,4247.342,4119.575,4168.659,4442.971,4293.488,3484.798,4183.41,
+22,postgres_air,original,2,Solution 1,"SELECT passenger_id,
+CASE
+WHEN age <= 2 THEN 'Infant'
+WHEN age <= 12 THEN 'Child'
+WHEN age < 65 THEN 'Adult'
+ELSE 'Senior'
+END FROM passenger LIMIT 5000000;",1342.371,1356.252,1381.993,1368.349,1469.486,1462.935,1346.067,1381.795,1918.448,1383.846,1441.15,65.55083054254783
+22,imdb_old,reproduced,1,Baseline,"SELECT id, name, company_from(country_code)
+FROM company_name;",200.087,204.602,199.893,215.71,201.853,198.934,225.443,191.019,191.261,217.303,204.61,
+22,imdb_old,reproduced,2,Solution 1,"SELECT id, name, 
+CASE
+WHEN country_code = '[null]' THEN 'Unknown'
+WHEN country_code = '[en]' THEN 'USA'
+WHEN country_code = '[gb]' THEN 'Great Britain'
+WHEN country_code = '[de]' THEN 'Germany'
+WHEN country_code = '[sp]' THEN 'Spain'
+WHEN country_code = '[it]' THEN 'Italy'
+WHEN country_code = '[fr]' THEN 'France'
+WHEN country_code = '[ca]' THEN 'Canada'
+WHEN country_code = '[jp]' THEN 'Japan'
+ELSE 'Other' END 
+FROM company_name;",88.561,86.249,102.127,86.196,103.424,108.759,85.542,85.696,86.105,96.553,92.92,54.5867748399394

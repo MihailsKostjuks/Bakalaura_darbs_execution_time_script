@@ -1,0 +1,48 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+17,postgres_air,original,1,Baseline,"CREATE TEMP TABLE flights_totals AS
+SELECT
+bl.flight_id,
+departure_airport,
+(AVG(price))::numeric (7,2) AS avg_price,
+COUNT(DISTINCT passenger_id) AS num_passengers
+FROM booking b
+JOIN booking_leg bl USING (booking_id)
+JOIN flight f USING (flight_id)
+JOIN passenger p USING (booking_id)
+GROUP BY 1,2;
+
+SELECT flight_id,
+avg_price,
+num_passengers
+FROM flights_totals
+WHERE flight_id=222183;",103228.877,101725.363,100049.17,126115.247,133332.791,150246.629,105439.103,102287.986,104976.065,96671.218,112407.24,
+17,postgres_air,original,2,Solution 1,"SELECT * FROM
+(SELECT 
+bl.flight_id,
+departure_airport,
+(AVG(price))::numeric (7,2) AS avg_price,
+COUNT(DISTINCT passenger_id) AS num_passengers
+FROM booking b
+JOIN booking_leg bl USING (booking_id)
+JOIN flight f USING (flight_id)
+JOIN passenger p USING (booking_id)
+GROUP BY 1,2) a
+WHERE flight_id=222183;",1383.45,1390.678,1409.301,1355.492,1380.165,1444.339,1381.736,1383.759,1459.934,1378.575,1396.74,98.75742879195325
+17,imdb_old,reproduced,1,Baseline,"CREATE TEMP TABLE ratings AS 
+SELECT t.title AS movie_title, MAX(mi_idx.info) AS max_rating, t.id AS title_id
+FROM info_type it
+JOIN movie_info_idx mi_idx ON it.id = mi_idx.info_type_id
+JOIN title t ON t.id = mi_idx.movie_id
+WHERE it.info = 'rating'
+GROUP BY movie_title, t.id;
+
+SELECT * FROM ratings WHERE title_id = 1088622;",1397.901,1399.836,1354.5720000000001,1413.735,1421.508,1388.1329999999998,1372.7530000000002,1401.688,1397.9360000000001,1408.806,1395.69,
+17,imdb_old,reproduced,2,Solution 1,"SELECT * FROM (
+SELECT t.title AS movie_title, MAX(mi_idx.info) AS max_rating, t.id AS title_id
+FROM info_type it
+JOIN movie_info_idx mi_idx ON it.id = mi_idx.info_type_id
+JOIN title t ON t.id = mi_idx.movie_id
+WHERE it.info = 'rating'
+GROUP BY movie_title, t.id
+) ratings
+WHERE title_id = 1088622;",0.092,0.09,0.097,0.091,0.097,0.102,0.171,0.153,0.098,0.089,0.11,99.99211859367053

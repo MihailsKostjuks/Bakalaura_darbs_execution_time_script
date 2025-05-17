@@ -1,0 +1,17 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+19,postgres_air,original,1,Baseline,"SELECT flight_id
+FROM flight_departure
+WHERE departure_airport='ORD';",7020.634,9617.682,4827.751,6449.306,5899.742,14471.049,7575.567,5832.692,5522.993,12634.121,7985.15,
+19,postgres_air,original,2,Solution 1,"SELECT flight_id FROM flight
+WHERE departure_airport='ORD'
+AND flight_id IN (SELECT flight_id FROM booking_leg);",2819.272,3314.488,8498.119,2831.537,9971.263,2520.602,2780.6,2857.629,10162.273,2572.75,4832.85,39.47702923551842
+19,imdb_old,reproduced,1,Baseline,"SELECT title_id, info FROM movie_company_infos
+WHERE production_year = 2000
+GROUP BY 1,2
+ORDER BY title_id;",2976.796,2871.916,2914.086,3071.711,3025.47,3003.007,2934.653,3515.99,2977.464,3375.13,3066.62,
+19,imdb_old,reproduced,2,Solution 1,"SELECT t.id, mi.info
+FROM title AS t
+JOIN movie_info AS mi ON t.id = mi.movie_id
+WHERE production_year = 2000
+GROUP BY 1,2
+ORDER BY t.id;",1800.399,1731.444,1751.003,1734.154,1718.146,1867.791,1797.168,1706.953,1733.635,1812.458,1765.32,42.43434139215162

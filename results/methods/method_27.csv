@@ -1,0 +1,25 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+27,postgres_air,original,1,Baseline,"SELECT * FROM flight 
+WHERE departure_airport = 'ATL' 
+AND status = 'Delayed'
+ORDER BY flight_id
+LIMIT 50
+OFFSET 1000;",11.402,11.34,11.613,11.367,11.463,11.402,11.6,11.453,11.369,11.451,11.45,
+27,postgres_air,original,2,Solution 1,"SELECT * FROM flight 
+WHERE departure_airport = 'ATL' 
+AND status = 'Delayed'
+AND flight_id > 160384
+ORDER BY flight_id
+LIMIT 50;",4.485,4.428,4.497,4.459,4.512,4.553,4.527,4.544,4.57,4.554,4.51,60.61135371179039
+27,imdb_old,reproduced,1,Baseline,"SELECT * FROM title
+WHERE season_nr = 1
+AND production_year BETWEEN 2002 AND 2008
+ORDER BY id 
+LIMIT 100
+OFFSET 5000;",32.08,34.293,33.646,31.018,31.509,34.023,32.993,36.233,31.59,33.061,33.04,
+27,imdb_old,reproduced,2,Solution 1,"SELECT * FROM title
+WHERE season_nr = 1
+AND production_year BETWEEN 2002 AND 2008
+AND id > 54352
+ORDER BY id 
+LIMIT 100;",1.623,1.624,1.62,1.619,2.018,1.612,1.616,1.599,1.608,1.604,1.65,95.00605326876513

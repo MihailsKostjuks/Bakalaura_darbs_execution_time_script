@@ -1,0 +1,27 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+23,postgres_air,original,1,Baseline,"SELECT * FROM select_booking ('lawton52',
+NULL,
+NULL,
+NULL,
+NULL
+);",3575.302,3592.419,3692.927,3638.683,3569.331,3595.969,3592.645,3611.334,3608.191,3555.946,3603.27,
+23,postgres_air,original,2,Solution 1,"SELECT * FROM select_booking_dyn ('lawton52',
+NULL,
+NULL,
+NULL,
+NULL
+);",2691.898,2668.371,2675.553,2637.378,2764.334,2700.939,2663.081,2625.91,2659.577,2599.92,2668.7,25.936718591723633
+23,imdb_old,reproduced,1,Baseline,"SELECT * FROM select_title(
+2010,
+NULL,
+NULL,
+NULL,
+NULL
+);",420.742,423.42,461.485,451.106,445.253,419.317,413.704,464.254,461.414,451.223,441.19,
+23,imdb_old,reproduced,2,Solution 1,"SELECT * FROM select_title_dyn(
+2010,
+NULL,
+NULL,
+NULL,
+NULL
+);",401.304,375.342,376.164,376.745,374.326,379.862,377.815,378.018,376.223,376.442,379.22,14.04610258618735

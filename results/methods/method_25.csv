@@ -1,0 +1,5 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+25,postgres_air,original,1,Baseline,"SELECT * FROM account ORDER BY first_name, last_name;",1483.4,1443.184,1442.022,1421.797,1511.606,1458.376,1474.028,1427.788,1446.23,1427.599,1453.6,
+25,postgres_air,original,2,Solution 1,"SELECT * FROM account ORDER BY first_name, last_name;",1363.629,1344.273,1356.948,1451.064,1387.206,1355.431,1370.739,1373.673,1363.703,1335.71,1370.24,5.7347275729223925
+25,imdb_old,reproduced,1,Baseline,"SELECT * FROM company_name ORDER BY name, country_code;",1415.752,1478.142,1434.736,1430.413,1449.042,1442.116,1456.579,1456.611,1454.512,1484.602,1450.25,
+25,imdb_old,reproduced,2,Solution 1,"SELECT * FROM company_name ORDER BY name, country_code;",1359.7,1371.832,1402.503,1372.602,1380.569,1382.304,1375.256,1380.851,1394.714,1390.817,1381.11,4.767453887260824

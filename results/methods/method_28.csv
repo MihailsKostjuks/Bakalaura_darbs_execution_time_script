@@ -1,0 +1,13 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+28,postgres_air,original,1,Baseline,"SELECT * FROM flight 
+WHERE status = 'Delayed'
+AND actual_departure BETWEEN '2020-05-10' AND '2020-10-15';",20.627,21.095,20.955,20.931,20.951,21.212,20.93,20.715,21.084,20.632,20.91,
+28,postgres_air,original,2,Solution 1,"SELECT * FROM flight 
+WHERE status = 'Delayed'
+AND actual_departure BETWEEN '2020-05-10' AND '2020-10-15';",15.277,15.166,15.226,15.387,15.156,15.326,15.169,15.159,15.152,15.129,15.21,27.259684361549496
+28,imdb_old,reproduced,1,Baseline,"SELECT * FROM aka_title
+WHERE production_year BETWEEN 1980 AND 2000
+AND note LIKE '(Argentina%';",1.064,1.05,1.076,1.047,1.044,1.042,1.045,1.043,1.058,1.053,1.05,
+28,imdb_old,reproduced,2,Solution 1,"SELECT * FROM aka_title
+WHERE production_year BETWEEN 1980 AND 2000
+AND note LIKE '(Argentina%';",1.446,1.438,1.456,1.514,1.488,1.469,1.466,1.433,1.504,1.462,1.47,-39.99999999999999

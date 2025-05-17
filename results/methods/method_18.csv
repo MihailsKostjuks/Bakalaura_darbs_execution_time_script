@@ -1,0 +1,26 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+18,postgres_air,original,1,Baseline,"SELECT * FROM flight_stats fs
+JOIN (SELECT flight_id FROM flight f
+WHERE actual_departure BETWEEN '2020-08-01' AND '2020-08-16') fl
+ON fl.flight_id=fs.flight_id;",97954.757,98376.897,85230.08,88035.576,84494.061,86054.919,87534.804,85323.589,87007.328,85860.367,88587.24,
+18,postgres_air,original,2,Solution 1,"SELECT 
+bl.flight_id,
+departure_airport,
+(AVG(price))::numeric (7,2) AS avg_price,
+COUNT(DISTINCT passenger_id) AS num_passengers
+FROM booking b
+JOIN booking_leg bl USING (booking_id)
+JOIN flight f USING (flight_id)
+JOIN passenger p USING (booking_id)
+WHERE actual_departure BETWEEN '2020-08-01' AND '2020-08-16'
+GROUP BY 1,2;",6512.18,10681.999,6219.89,6513.793,12510.747,6391.777,8803.582,6261.047,5260.936,10832.971,7998.89,90.97060705356664
+18,imdb_old,reproduced,1,Baseline,"SELECT * FROM us_title_stats
+JOIN (SELECT id FROM title WHERE production_year BETWEEN 2005 AND 2010) t
+ON t.id = us_title_stats.title_id;",1884.811,1850.006,1924.797,1871.595,1900.723,1935.103,1896.925,1900.237,1893.935,1876.164,1893.43,
+18,imdb_old,reproduced,2,Solution 1,"SELECT title.production_year AS prod_year, title.id AS title_id, COUNT(DISTINCT title.id) AS amount_of_titles
+FROM title
+JOIN movie_companies ON title.id = movie_companies.movie_id
+JOIN company_name ON company_name.id = movie_companies.company_id
+WHERE company_name.country_code = '[us]'
+AND title.production_year BETWEEN 2005 AND 2010
+GROUP BY 1, 2;",703.028,783.457,735.599,758.497,758.112,730.855,705.73,707.731,705.899,752.073,734.1,61.229092176631816

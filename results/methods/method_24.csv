@@ -1,0 +1,53 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+24,postgres_air,original,1,Baseline,"SELECT
+city,
+date_trunc('month', scheduled_departure),
+SUM(passengers) passengers
+FROM airport a
+JOIN flight f ON airport_code = departure_airport
+JOIN (
+SELECT flight_id, COUNT(*) passengers
+FROM booking_leg l
+JOIN boarding_pass b USING (booking_leg_id)
+WHERE boarding_time > '2020-07-15' AND boarding_time < '2020-07-31'
+GROUP BY flight_id
+) cnt
+USING (flight_id)
+GROUP BY 1,2
+ORDER BY 3 DESC;",11545.841,6447.091,7010.965,6718.521,11657.123,5948.202,5886.499,6130.768,8728.445,5787.125,7586.06,
+24,postgres_air,original,2,Solution 1,"SELECT
+city,
+date_trunc('month', scheduled_departure),
+SUM(passengers) passengers
+FROM airport a
+JOIN flight f ON airport_code = departure_airport
+JOIN (
+SELECT flight_id, COUNT(*) passengers
+FROM booking_leg l
+JOIN boarding_pass_part b USING (booking_leg_id)
+WHERE boarding_time > '2020-07-15' AND boarding_time < '2020-07-31'
+GROUP BY flight_id
+) cnt
+USING (flight_id)
+GROUP BY 1,2
+ORDER BY 3 DESC;",12894.893,9848.563,7576.249,5895.462,10816.063,5385.998,5490.784,10889.74,6353.373,11079.895,8623.1,-13.67033743471578
+24,imdb_stokholm,reproduced,1,Baseline,"SELECT
+region,
+premiered,
+COUNT(*) AS people_count
+FROM titles t
+JOIN crew c ON t.title_id = c.title_id
+JOIN akas ON akas.title_id = t.title_id
+WHERE category IN ('actor', 'actress', 'director')
+GROUP BY region, premiered
+ORDER BY people_count DESC;",2425.85,2504.235,2524.682,2495.36,9898.132,2667.64,2553.721,2552.795,2542.571,3090.617,3325.56,
+24,imdb_stokholm,reproduced,2,Solution 1,"SELECT
+region,
+premiered,
+COUNT(*) AS people_count
+FROM titles t
+JOIN crew_part c ON t.title_id = c.title_id
+JOIN akas ON akas.title_id = t.title_id
+WHERE category IN ('actor', 'actress', 'director')
+GROUP BY region, premiered
+ORDER BY people_count DESC;",2335.447,2286.635,2296.786,2346.93,2498.773,2316.407,2339.738,2525.781,3527.642,2268.119,2474.23,25.599598263149666
