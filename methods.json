@@ -558,9 +558,7 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [
-              ""
-            ],
+            "setup_scripts": [],
             "query_script": "SELECT id FROM title\nWHERE id NOT IN (SELECT movie_id FROM aka_title);",
             "cleanup_scripts": []
           },
@@ -595,9 +593,7 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [
-              ""
-            ],
+            "setup_scripts": [],
             "query_script": "SELECT id FROM title\nWHERE id IN (SELECT movie_id FROM aka_title);",
             "cleanup_scripts": []
           },
@@ -632,9 +628,7 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [
-              ""
-            ],
+            "setup_scripts": [],
             "query_script": "SELECT \nCASE WHEN c.country_code = '[es]' THEN 'Old TV movies made by Spanish companies'\nELSE 'Modern TV movies made by Italian companies' END AS description, t.title, t.production_year\nFROM title t\nJOIN movie_companies mc ON t.id = mc.movie_id\nJOIN company_name c ON mc.company_id = c.id\nWHERE mc.note LIKE '%TV%'\nAND (\n(c.country_code = '[es]' AND t.production_year < 2000)\nOR \n(c.country_code = '[it]' AND t.production_year > 2010)\n);",
             "cleanup_scripts": []
           },
@@ -672,9 +666,7 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [
-              ""
-            ],
+            "setup_scripts": [],
             "query_script": [
               "CREATE TEMP TABLE ratings AS \nSELECT t.title AS movie_title, MAX(mi_idx.info) AS max_rating, t.id AS title_id\nFROM info_type it\nJOIN movie_info_idx mi_idx ON it.id = mi_idx.info_type_id\nJOIN title t ON t.id = mi_idx.movie_id\nWHERE it.info = 'rating'\nGROUP BY movie_title, t.id;",
               "SELECT * FROM ratings WHERE title_id = 1088622;"
@@ -890,13 +882,26 @@
         "database_name": "postgres_air",
         "baseline_and_variations": [
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_same_session": true,
+            "setup_scripts": [
+              "DROP FUNCTION IF EXISTS select_booking;",
+              "DROP FUNCTION IF EXISTS select_booking_dyn;",
+              "DROP FUNCTION IF EXISTS select_booking_email_departure;",
+              "DROP TYPE IF EXISTS booking_record_basic;",
+              "CREATE TYPE booking_record_basic AS\n(booking_id bigint,\nbooking_ref text,\nbooking_name text ,\naccount_id integer,\nemail text );",
+              "CREATE OR REPLACE FUNCTION select_booking (p_email text,\np_dep_airport text,\np_arr_airport text,\np_dep_date date,\np_flight_id int)\nRETURNS SETOF booking_record_basic\nAS\n$func$\nBEGIN\nRETURN QUERY\nSELECT DISTINCT b.booking_id, b.booking_ref,\nbooking_name, account_id, email\nFROM booking b \nJOIN booking_leg bl USING (booking_id)\nJOIN flight f USING (flight_id)\nWHERE (p_email IS NULL OR lower(email) LIKE p_email||'%')\nAND (p_dep_airport IS NULL OR departure_airport=p_dep_airport)\nAND (p_arr_airport IS NULL OR arrival_airport=p_arr_airport)\nAND (p_dep_date IS NULL OR scheduled_departure BETWEEN p_dep_date AND p_dep_date + 1)\nAND (p_flight_id IS NULL OR bl.flight_id=p_flight_id);\nEND;\n$func$ LANGUAGE plpgsql;",
+              "SELECT * FROM select_booking ('lawton52',\n'ORD',\n'JFK',\n'2020-07-30',\n27191\n);"
+            ],
+            "query_script": "SELECT * FROM select_booking ('lawton52',\nNULL,\nNULL,\nNULL,\nNULL\n);",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_same_session": true,
+            "setup_scripts": [
+              "CREATE OR REPLACE FUNCTION select_booking_dyn (p_email text,\np_dep_airport text,\np_arr_airport text,\np_dep_date date,\np_flight_id int)\nRETURNS SETOF booking_record_basic\nAS\n$func$\nDECLARE\nv_sql text:='SELECT DISTINCT b.booking_id, b.booking_ref, booking_name,\naccount_id, email\nFROM booking b ';\nv_where_booking text;\nv_where_booking_leg text;\nv_where_flight text;\nBEGIN\nIF p_email IS NOT NULL\nTHEN v_where_booking :=$$ LOWER(email) LIKE $$\n||quote_literal(p_email||'%'); END IF;\nIF p_flight_id IS NOT NULL then v_where_booking_leg:= $$ flight_id=$$||p_flight_id::text;\nEND IF;\nIF p_dep_airport IS NOT NULL\nTHEN v_where_flight:=concat_ws($$ AND $$, v_where_flight, $$departure_airport=$$||\nquote_literal(p_dep_airport));\nEND IF;\nIF p_arr_airport IS NOT NULL\nTHEN v_where_flight:=concat_ws($$ AND $$,v_where_flight,\n$$arrival_airport=$$||quote_literal(p_arr_airport));\nEND IF;\nIF p_dep_date IS NOT NULL\nTHEN v_where_flight:=concat_ws($$ AND $$,v_where_flight,\n$$scheduled_departure BETWEEN $$||\nquote_literal(p_dep_date)||$$::date AND $$||quote_literal(p_dep_date)||$$::date+1$$);\nEND IF;\nIF v_where_flight IS NOT NULL OR v_where_booking_leg IS NOT NULL\nTHEN v_sql:=v_sql||$$ JOIN booking_leg bl USING (booking_id) $$;\nEND IF;\nIF v_where_flight IS NOT NULL THEN\nv_sql:=v_sql ||$$ JOIN flight f USING (flight_id) $$;\nEND IF;\nv_sql:=v_sql ||$$ WHERE $$||\nconcat_ws($$ AND $$,v_where_booking, v_where_booking_leg, v_where_flight);\nRETURN QUERY EXECUTE (v_sql);\nEND;\n$func$ LANGUAGE plpgsql;",
+              "SELECT * FROM select_booking_dyn ('lawton52',\n'ORD',\n'JFK',\n'2020-07-30',\n27191\n);"
+            ],
+            "query_script": "SELECT * FROM select_booking_dyn ('lawton52',\nNULL,\nNULL,\nNULL,\nNULL\n);",
             "cleanup_scripts": []
           }
         ]
@@ -905,13 +910,25 @@
         "database_name": "imdb_old",
         "baseline_and_variations": [
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_same_session": true,
+            "setup_scripts": [
+              "DROP FUNCTION IF EXISTS select_title;",
+              "DROP FUNCTION IF EXISTS select_title_dyn;",
+              "DROP TYPE IF EXISTS title_info;",
+              "CREATE TYPE title_info AS\n(\ntitle_id int,\ntitle character varying,\nproduction_year int,\nseason_nr int,\nepisode_nr int,\nseries_years character varying\n);",
+              "CREATE OR REPLACE FUNCTION select_title (\np_production_year int,\np_title character varying,\np_episode_nr int,\np_country_code text,\np_company_name text\n)\nRETURNS SETOF title_info\nAS\n$func$\nBEGIN\nRETURN QUERY\nSELECT DISTINCT title.id, title, production_year, season_nr, episode_nr, series_years\nFROM title\nJOIN movie_companies ON title.id = movie_companies.movie_id\nJOIN company_name ON company_name.id = movie_companies.company_id\nWHERE (p_production_year IS NULL OR production_year = p_production_year)\nAND (p_title IS NULL OR title ILIKE '%' || p_title || '%')\nAND (p_episode_nr IS NULL OR episode_nr = p_episode_nr)\nAND (p_country_code IS NULL OR country_code = p_country_code)\nAND (p_company_name IS NULL OR name ILIKE '%' || p_company_name || '%');\nEND;\n$func$ LANGUAGE plpgsql;",
+              "SELECT * FROM select_title(\n2012,\n'year',\n1,\n'[us]',\n'a'\n);"
+            ],
+            "query_script": "SELECT * FROM select_title(\n2010,\nNULL,\nNULL,\nNULL,\nNULL\n);",
             "cleanup_scripts": []
           },
           {
-            "setup_scripts": [],
-            "query_script": "",
+            "setup_same_session": true,
+            "setup_scripts": [
+              "CREATE OR REPLACE FUNCTION select_title_dyn (\np_production_year int,\np_title character varying,\np_episode_nr int,\np_country_code text,\np_company_name text\n)\nRETURNS SETOF title_info\nAS\n$func$\nDECLARE\nv_sql text := 'SELECT DISTINCT t.id, t.title, t.production_year, t.season_nr, t.episode_nr, t.series_years FROM title t';\nv_where_title text;\nv_where_movie_companies text;\nv_where_company_name text;\nBEGIN\nIF p_production_year IS NOT NULL\nTHEN v_where_title := 'production_year = ' || p_production_year::text;\nEND IF;\nIF p_title IS NOT NULL\nTHEN v_where_title := concat_ws(' AND ', v_where_title, 'title ILIKE ' || quote_literal('%' || p_title || '%'));\nEND IF;\nIF p_episode_nr IS NOT NULL\nTHEN v_where_title := concat_ws(' AND ', v_where_title, 'episode_nr = ' || p_episode_nr::text);\nEND IF;\nIF p_country_code IS NOT NULL\nTHEN v_where_movie_companies := 'country_code = ' || quote_literal(p_country_code);\nEND IF;\nIF p_company_name IS NOT NULL\nTHEN v_where_company_name := 'name ILIKE ' || quote_literal('%' || p_company_name || '%');\nEND IF;\nIF v_where_movie_companies IS NOT NULL OR v_where_company_name IS NOT NULL\nTHEN v_sql := v_sql || ' JOIN movie_companies mc ON t.id = mc.movie_id';\nEND IF;\nIF v_where_company_name IS NOT NULL\nTHEN v_sql := v_sql || ' JOIN company_name cn ON cn.id = mc.company_id';\nEND IF;\nv_sql := v_sql || ' WHERE ' || concat_ws(' AND ', v_where_title, v_where_movie_companies, v_where_company_name);\nRETURN QUERY EXECUTE v_sql;\nEND;\n$func$ LANGUAGE plpgsql;",
+              "SELECT * FROM select_title_dyn(\n2012,\n'year',\n1,\n'[us]',\n'a'\n);"
+            ],
+            "query_script": "SELECT * FROM select_title_dyn(\n2010,\nNULL,\nNULL,\nNULL,\nNULL\n);",
             "cleanup_scripts": []
           }
         ]
