@@ -833,7 +833,7 @@
           },
           {
             "setup_scripts": [],
-            "query_script": "SELECT \nt.title_id,\nt.primary_title,\nCOUNT(DISTINCT p.person_id) AS num_people\nFROM public.titles t\nJOIN public.crew c ON t.title_id = c.title_id\nJOIN public.people p ON c.person_id = p.person_id\nWHERE t.type = 'tvSpecial'\nAND c.category = 'actor'\nGROUP BY t.title_id\nORDER BY num_actors DESC;",
+            "query_script": "SELECT \nt.title_id,\nt.primary_title,\nCOUNT(DISTINCT p.person_id) AS num_actors\nFROM public.titles t\nJOIN public.crew c ON t.title_id = c.title_id\nJOIN public.people p ON c.person_id = p.person_id\nWHERE t.type = 'tvSpecial'\nAND c.category = 'actor'\nGROUP BY t.title_id\nORDER BY num_actors DESC;",
             "cleanup_scripts": []
           }
         ]
