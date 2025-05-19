@@ -1,0 +1,32 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+21,postgres_air,original,1,Baseline,"SELECT flight_id, num_passengers(flight_id) AS num_pass
+FROM flight f
+WHERE departure_airport='ORD'
+AND scheduled_departure BETWEEN '2020-07-05' AND '2020-07-13';",600000,600000,600000,600000,600000,600000,600000,600000,600000,600000,600000.0,
+21,postgres_air,original,2,Solution 1,"SELECT f.flight_id, COUNT(*) AS num_pass
+FROM booking_leg bl
+JOIN booking b USING (booking_id)
+JOIN passenger p USING (booking_id)
+JOIN flight f USING (flight_id)
+WHERE departure_airport='ORD'
+AND scheduled_departure BETWEEN '2020-07-05' AND '2020-07-13'
+GROUP BY 1;",1975.316,1907.99,1876.692,1880.709,1924.99,1900.813,1913.87,1884.418,1914.584,1947.092,1912.65,99.681225
+21,imdb_stokholm,reproduced,1,Baseline,"SELECT 
+t.title_id,
+t.primary_title,
+num_people_by_job(t.title_id, 'actor') AS num_actors
+FROM public.titles t
+WHERE type = 'tvSpecial'
+GROUP BY t.title_id
+ORDER BY num_actors DESC;",600000,600000,600000,600000,600000,600000,600000,600000,600000,600000,600000.0,
+21,imdb_stokholm,reproduced,2,Solution 1,"SELECT 
+t.title_id,
+t.primary_title,
+COUNT(DISTINCT p.person_id) AS num_actors
+FROM public.titles t
+JOIN public.crew c ON t.title_id = c.title_id
+JOIN public.people p ON c.person_id = p.person_id
+WHERE t.type = 'tvSpecial'
+AND c.category = 'actor'
+GROUP BY t.title_id
+ORDER BY num_actors DESC;",656.825,672.692,635.073,626.11,593.614,744.676,836.344,953.716,874.561,979.371,757.3,99.87378333333332

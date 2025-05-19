@@ -1,0 +1,11 @@
+Method id,Database name,Dataset type,Variant id,Variant,Executed query,1st run (ms),2nd run (ms),3rd run (ms),4th run (ms),5th run (ms),6th run (ms),7th run (ms),8th run (ms),9th run (ms),10th run (ms),Average (ms),Performance improvement (%)
+14,postgres_air,original,1,Baseline,"SELECT flight_id FROM flight 
+WHERE flight_id NOT IN (SELECT flight_id FROM booking_leg);",600000,600000,600000,600000,600000,600000,600000,600000,600000,600000,600000.0,
+14,postgres_air,original,2,Solution 1,"SELECT flight_id FROM flight f
+EXCEPT
+SELECT flight_id FROM booking_leg;",13070.575,12702.034,12860.918,12860.054,12934.991,12653.96,12592.426,12630.553,12919.457,12667.003,12789.2,97.86846666666668
+14,imdb_old,reproduced,1,Baseline,"SELECT id FROM title
+WHERE id NOT IN (SELECT movie_id FROM aka_title);",600000,600000,600000,600000,600000,600000,600000,600000,600000,600000,600000.0,
+14,imdb_old,reproduced,2,Solution 1,"SELECT id FROM title
+EXCEPT
+SELECT movie_id FROM aka_title;",2053.137,2096.736,2130.183,2072.529,2081.168,2077.592,2115.439,2083.902,2089.428,2083.823,2088.39,99.65193500000001
